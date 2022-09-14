@@ -1,4 +1,5 @@
 #include "./types.h"
+#include "./cards.c"
 
 int main(void)
 {
@@ -8,20 +9,12 @@ int main(void)
   card cards[TOTAL_CARDS_NUMBER];
   for (size_t i = four, j = 0; i <= three; i++)
   {
-    card card1;
-    card card2;
-    card card3;
-    card card4;
+    card card1 = create_card(true, i, spades, i);
+    card card2 = create_card(true, i, hearts, i);
+    card card3 = create_card(true, i, diamonds, i);
+    card card4 = create_card(true, i, clubs, i);
 
-    card1.available = card2.available = card3.available = card4.available = true;
-    card1.rank = card2.rank = card3.rank = card4.rank = i;
-    card1.value = card2.value = card3.value = card4.value = i;
-
-    card1.suit = spades;
-    card2.suit = hearts;
-    card3.suit = diamonds;
-    card4.suit = clubs;
-
+    // special cards below
     if (i == four)
     {
       card4.value = fourclubs;
@@ -38,6 +31,7 @@ int main(void)
       card1.value = acespades;
     }
 
+    // pushing to the deck of cards
     cards[j++] = card1;
     cards[j++] = card2;
     cards[j++] = card3;
