@@ -41,3 +41,8 @@ typedef struct card
   bool available;
   int value;
 } card;
+
+/*
+ prototypes
+*/
+card create_card(bool available, enum rank rank, enum suits suit, int value);

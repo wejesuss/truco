@@ -1,5 +1,4 @@
 #include "./types.h"
-#include "./cards.c"
 
 int main(void)
 {
