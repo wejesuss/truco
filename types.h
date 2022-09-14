@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define TOTAL_CARDS_NUMBER 40
 
@@ -45,5 +47,7 @@ typedef struct card
 /*
  prototypes
 */
+
 card create_card(bool available, enum rank rank, enum suits suit, int value);
 void set_deck(card *cards);
+char *get_card_name(char cardname[5], enum suits suit, int value);
