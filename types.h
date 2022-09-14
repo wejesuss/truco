@@ -46,3 +46,4 @@ typedef struct card
  prototypes
 */
 card create_card(bool available, enum rank rank, enum suits suit, int value);
+void set_deck(card *cards);
