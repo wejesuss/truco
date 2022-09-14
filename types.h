@@ -26,6 +26,14 @@ enum rank
   three
 };
 
+enum specialcards
+{
+  fourclubs = 14,
+  sevenhearts = 13,
+  acespades = 12,
+  sevendiamonds = 11
+};
+
 typedef struct card
 {
   enum suits suit;
