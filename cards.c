@@ -49,46 +49,46 @@ char *get_card_name(char cardname[5], enum suits suit, int value)
 {
   switch (value)
   {
-  case 14:
+  case fourclubs:
     strcpy(cardname, "4");
     break;
-  case 13:
+  case sevenhearts:
     strcpy(cardname, "7");
     break;
-  case 12:
+  case acespades:
     strcpy(cardname, "A");
     break;
-  case 11:
+  case sevendiamonds:
     strcpy(cardname, "7");
     break;
-  case 10:
+  case three:
     strcpy(cardname, "3");
     break;
-  case 9:
+  case two:
     strcpy(cardname, "2");
     break;
-  case 8:
+  case ace:
     strcpy(cardname, "A");
     break;
-  case 7:
+  case king:
     strcpy(cardname, "K");
     break;
-  case 6:
+  case jack:
     strcpy(cardname, "J");
     break;
-  case 5:
+  case queen:
     strcpy(cardname, "Q");
     break;
-  case 4:
+  case seven:
     strcpy(cardname, "7");
     break;
-  case 3:
+  case six:
     strcpy(cardname, "6");
     break;
-  case 2:
+  case five:
     strcpy(cardname, "5");
     break;
-  case 1:
+  case four:
     strcpy(cardname, "4");
     break;
   default:
