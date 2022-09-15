@@ -11,7 +11,9 @@ int main(void)
   char cardname[15];
   for (size_t i = 0; i < TOTAL_CARDS_NUMBER; i++)
   {
-    printf("%s\n", get_card_name(&cardname[5], cards[i].suit, cards[i].value));
+    printf("%s %i\n",
+           get_card_name(&cardname[5], cards[i].suit, cards[i].value),
+           cards[i].value);
   }
 
   return 0;
