@@ -29,7 +29,7 @@ enum rank
 
 enum specialcards
 {
-  downcard = 0,
+  card_down = 0,
   fourclubs = 14,
   sevenhearts = 13,
   acespades = 12,
