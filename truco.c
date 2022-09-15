@@ -12,7 +12,7 @@ int main(void)
   for (size_t i = 0; i < TOTAL_CARDS_NUMBER; i++)
   {
     printf("%s %i\n",
-           get_card_name(&cardname[5], cards[i].suit, cards[i].value),
+           get_card_name(&cardname[5], downcard, downcard),
            cards[i].value);
   }
 

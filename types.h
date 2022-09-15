@@ -15,8 +15,7 @@ enum suits
 
 enum rank
 {
-  downcard,
-  four,
+  four = 1,
   five,
   six,
   seven,
@@ -30,6 +29,7 @@ enum rank
 
 enum specialcards
 {
+  downcard = -1,
   fourclubs = 14,
   sevenhearts = 13,
   acespades = 12,

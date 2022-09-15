@@ -111,7 +111,7 @@ char *get_card_name(char cardname[5], enum suits suit, int value)
     strcpy(&cardname[1], "♣");
     break;
   default:
-    strcpy(&cardname[1], '\0');
+    strcpy(&cardname[1], "\0");
     break;
   }
 
