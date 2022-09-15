@@ -45,22 +45,10 @@ void set_deck(card *cards)
   }
 }
 
-char *get_card_name(char cardname[5], enum suits suit, int value)
+char *get_card_name(char cardname[5], enum suits suit, enum rank rank)
 {
-  switch (value)
+  switch (rank)
   {
-  case fourclubs:
-    strcpy(cardname, "4");
-    break;
-  case sevenhearts:
-    strcpy(cardname, "7");
-    break;
-  case acespades:
-    strcpy(cardname, "A");
-    break;
-  case sevendiamonds:
-    strcpy(cardname, "7");
-    break;
   case three:
     strcpy(cardname, "3");
     break;

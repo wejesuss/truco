@@ -7,10 +7,10 @@
 
 enum suits
 {
-  spades,   // (♠)
-  hearts,   // (♥)
-  diamonds, // (♦)
-  clubs     // (♣)
+  spades = 1, // (♠)
+  hearts,     // (♥)
+  diamonds,   // (♦)
+  clubs       // (♣)
 };
 
 enum rank
@@ -29,7 +29,7 @@ enum rank
 
 enum specialcards
 {
-  downcard = -1,
+  downcard = 0,
   fourclubs = 14,
   sevenhearts = 13,
   acespades = 12,
@@ -50,4 +50,4 @@ typedef struct card
 
 card create_card(bool available, enum rank rank, enum suits suit, int value);
 void set_deck(card *cards);
-char *get_card_name(char cardname[5], enum suits suit, int value);
+char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
