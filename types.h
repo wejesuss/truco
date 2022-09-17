@@ -28,9 +28,9 @@ enum rank
   three
 };
 
-enum specialcards
+enum trumpcards
 {
-  card_down = 0,
+  facedown = 0,
   fourclubs = 14,
   sevenhearts = 13,
   acespades = 12,
