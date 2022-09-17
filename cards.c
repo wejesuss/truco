@@ -105,3 +105,19 @@ char *get_card_name(char cardname[5], enum suits suit, enum rank rank)
 
   return cardname;
 }
+
+// Shuffle algorithm by Ben Pfaff's Writings
+// see https://benpfaff.org/writings/clc/shuffle.html
+void shuffle_cards(card *cards)
+{
+  for (size_t i = 0; i < TOTAL_CARDS_NUMBER - 1; i++)
+  {
+    size_t j = i + rand() / (RAND_MAX / (TOTAL_CARDS_NUMBER - i) + 1);
+    if (j != i)
+    {
+      card t = cards[j];
+      cards[j] = cards[i];
+      cards[i] = t;
+    }
+  }
+}

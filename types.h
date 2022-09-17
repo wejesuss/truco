@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define TOTAL_CARDS_NUMBER 40
 
@@ -51,3 +52,5 @@ typedef struct card
 card create_card(bool available, enum rank rank, enum suits suit, int value);
 void set_deck(card *cards);
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
+void shuffle_cards(card *cards);
+void play_hand(card *cards, int *user_tentos, int *cpu_tentos);
