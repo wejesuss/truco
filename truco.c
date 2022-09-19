@@ -10,20 +10,15 @@ int main(void)
   card cards[TOTAL_CARDS_NUMBER];
   set_deck(cards);
 
+  player user, cpu;
   int user_tentos = 0;
   int cpu_tentos = 0;
+
+  user.player_tentos = &user_tentos;
+  cpu.player_tentos = &cpu_tentos;
   while (user_tentos < 12 && cpu_tentos < 12)
   {
-    play_hand(cards, &user_tentos, &cpu_tentos);
-  }
-
-  char cardname[15];
-  for (size_t i = 0; i < TOTAL_CARDS_NUMBER; i++)
-  {
-    printf("%s %s %i\n",
-           get_card_name(&cardname[0], cards[i].suit, cards[i].rank),
-           get_card_name(&cardname[5], facedown, facedown),
-           cards[i].value);
+    play_hand(cards, &user, &cpu);
   }
 
   printf("%i %i\n", user_tentos, cpu_tentos);
