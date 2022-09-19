@@ -60,3 +60,5 @@ void set_deck(card *cards);
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
 void shuffle_cards(card *cards);
 void play_hand(card *cards, player *user, player *cpu);
+void draw_cards(card *cards, player *user_ptr, player *cpu_ptr);
+void reset_deck(card *cards);

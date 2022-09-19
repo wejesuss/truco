@@ -121,3 +121,44 @@ void shuffle_cards(card *cards)
     }
   }
 }
+
+card get_card(card *cards, int index, int limit)
+{
+  int pos = index >= limit ? (index % limit) : index;
+
+  if (cards[pos].available)
+  {
+    card card = cards[pos];
+    cards[pos].available = false;
+
+    return card;
+  }
+  else
+  {
+    return get_card(cards, index + 1, limit);
+  }
+}
+
+void draw_cards(card *cards, player *user_ptr, player *cpu_ptr)
+{
+  int start = rand() % 40;
+
+  user_ptr->cards[0] = get_card(cards, start, TOTAL_CARDS_NUMBER);
+  user_ptr->cards[1] = get_card(cards, start + 1, TOTAL_CARDS_NUMBER);
+  user_ptr->cards[2] = get_card(cards, start + 2, TOTAL_CARDS_NUMBER);
+
+  cpu_ptr->cards[0] = get_card(cards, start + 3, TOTAL_CARDS_NUMBER);
+  cpu_ptr->cards[1] = get_card(cards, start + 4, TOTAL_CARDS_NUMBER);
+  cpu_ptr->cards[2] = get_card(cards, start + 5, TOTAL_CARDS_NUMBER);
+}
+
+void reset_deck(card *cards)
+{
+  for (int i = 0; i < TOTAL_CARDS_NUMBER; i++)
+  {
+    if (!cards[i].available)
+    {
+      cards[i].available = true;
+    }
+  }
+}
