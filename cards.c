@@ -139,17 +139,17 @@ card get_card(card *cards, int index, int limit)
   }
 }
 
-void draw_cards(card *cards, player *user_ptr, player *cpu_ptr)
+void draw_cards(card *cards, player *player1_ptr, player *player2_ptr)
 {
   int start = rand() % 40;
 
-  user_ptr->cards[0] = get_card(cards, start, TOTAL_CARDS_NUMBER);
-  user_ptr->cards[1] = get_card(cards, start + 1, TOTAL_CARDS_NUMBER);
-  user_ptr->cards[2] = get_card(cards, start + 2, TOTAL_CARDS_NUMBER);
+  player1_ptr->cards[0] = get_card(cards, start, TOTAL_CARDS_NUMBER);
+  player1_ptr->cards[1] = get_card(cards, start + 1, TOTAL_CARDS_NUMBER);
+  player1_ptr->cards[2] = get_card(cards, start + 2, TOTAL_CARDS_NUMBER);
 
-  cpu_ptr->cards[0] = get_card(cards, start + 3, TOTAL_CARDS_NUMBER);
-  cpu_ptr->cards[1] = get_card(cards, start + 4, TOTAL_CARDS_NUMBER);
-  cpu_ptr->cards[2] = get_card(cards, start + 5, TOTAL_CARDS_NUMBER);
+  player2_ptr->cards[0] = get_card(cards, start + 3, TOTAL_CARDS_NUMBER);
+  player2_ptr->cards[1] = get_card(cards, start + 4, TOTAL_CARDS_NUMBER);
+  player2_ptr->cards[2] = get_card(cards, start + 5, TOTAL_CARDS_NUMBER);
 }
 
 void reset_deck(card *cards)
