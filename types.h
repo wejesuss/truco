@@ -5,6 +5,7 @@
 #include <time.h>
 
 #define TOTAL_CARDS_NUMBER 40
+#define TOTAL_HAND_CARDS_NUMBER 3
 
 enum suits
 {
@@ -47,7 +48,7 @@ typedef struct card
 
 typedef struct player
 {
-  card cards[3];
+  card cards[TOTAL_HAND_CARDS_NUMBER];
   int *player_tentos;
 } player;
 
