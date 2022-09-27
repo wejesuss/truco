@@ -90,6 +90,61 @@ card ask_cpu_for_card(card *cpu_cards)
   return card;
 }
 
+card ask_user_for_card(card *user_cards)
+{
+  printf("\nSuas cartas são: ");
+  int available = show_player_cards(user_cards);
+
+  if (available > 1)
+  {
+    printf("\nEscolha uma carta (1 a %i): ", available);
+  }
+  else
+  {
+    printf("\nEscolha uma carta (1): ");
+  }
+
+  int choose = 0, pos = 0, found = 0;
+  card card;
+
+  scanf("%i", &choose);
+  while (true)
+  {
+    if (choose < 1 || choose > available)
+    {
+      if (available > 1)
+      {
+        printf("\nEscolha uma carta (1 a %i): ", available);
+      }
+      else
+      {
+        printf("\nEscolha uma carta (1): ");
+      }
+
+      scanf("%i", &choose);
+      continue;
+    }
+
+    card = user_cards[pos];
+    if (card.available)
+    {
+      user_cards[pos].available = false;
+      found++;
+    }
+
+    if (found == choose)
+    {
+      break;
+    }
+
+    pos++;
+  }
+
+  printf("\n");
+
+  return card;
+}
+
 trick play_first_trick(player *user_ptr, player *cpu_ptr)
 {
   card *user_cards = (*user_ptr).cards;
@@ -98,12 +153,14 @@ trick play_first_trick(player *user_ptr, player *cpu_ptr)
   card user_card, cpu_card;
   trick first_trick;
 
-  if (true)
+  if (is_user_foot)
   {
     cpu_card = ask_cpu_for_card(cpu_cards);
+    user_card = ask_user_for_card(user_cards);
   }
   else
   {
+    user_card = ask_user_for_card(user_cards);
     cpu_card = ask_cpu_for_card(cpu_cards);
   }
 
