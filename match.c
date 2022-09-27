@@ -157,12 +157,33 @@ trick play_first_trick(player *user_ptr, player *cpu_ptr)
   {
     cpu_card = ask_cpu_for_card(cpu_cards);
     user_card = ask_user_for_card(user_cards);
+    first_trick.is_tied_by_user = true;
   }
   else
   {
     user_card = ask_user_for_card(user_cards);
     cpu_card = ask_cpu_for_card(cpu_cards);
+    first_trick.is_tied_by_user = false;
   }
+
+  if (cpu_card.value > user_card.value)
+  {
+    first_trick.result = LOSE;
+    first_trick.is_tied_by_user = false;
+  }
+  else if (cpu_card.value < user_card.value)
+  {
+    first_trick.result = WIN;
+    first_trick.is_tied_by_user = false;
+  }
+  else
+  {
+    first_trick.result = TIE;
+  }
+
+  char cardname[10];
+  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
+  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
 
   return first_trick;
 }
