@@ -2,6 +2,19 @@
 
 bool is_user_foot = true;
 
+enum round_result
+{
+  TIE,
+  WIN,
+  LOSE
+};
+
+typedef struct trick
+{
+  enum round_result result;
+  bool is_tied_by_user;
+} trick;
+
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 {
   int *user_tentos = (*user_ptr).player_tentos;
