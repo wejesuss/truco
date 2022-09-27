@@ -145,6 +145,43 @@ card ask_user_for_card(card *user_cards)
   return card;
 }
 
+void ask_cards_from_players(bool is_user_foot,
+                            card *user_cards, card *cpu_cards,
+                            card *user_card, card *cpu_card,
+                            trick *first_trick)
+{
+  if (is_user_foot)
+  {
+    *cpu_card = ask_cpu_for_card(cpu_cards);
+    *user_card = ask_user_for_card(user_cards);
+    first_trick->is_tied_by_user = true;
+  }
+  else
+  {
+    *user_card = ask_user_for_card(user_cards);
+    *cpu_card = ask_cpu_for_card(cpu_cards);
+    first_trick->is_tied_by_user = false;
+  }
+}
+
+void set_trick_result(card user_card, card cpu_card, trick *first_trick)
+{
+  if (cpu_card.value > user_card.value)
+  {
+    first_trick->result = LOSE;
+    first_trick->is_tied_by_user = false;
+  }
+  else if (cpu_card.value < user_card.value)
+  {
+    first_trick->result = WIN;
+    first_trick->is_tied_by_user = false;
+  }
+  else
+  {
+    first_trick->result = TIE;
+  }
+}
+
 trick play_first_trick(player *user_ptr, player *cpu_ptr)
 {
   card *user_cards = (*user_ptr).cards;
@@ -153,33 +190,12 @@ trick play_first_trick(player *user_ptr, player *cpu_ptr)
   card user_card, cpu_card;
   trick first_trick;
 
-  if (is_user_foot)
-  {
-    cpu_card = ask_cpu_for_card(cpu_cards);
-    user_card = ask_user_for_card(user_cards);
-    first_trick.is_tied_by_user = true;
-  }
-  else
-  {
-    user_card = ask_user_for_card(user_cards);
-    cpu_card = ask_cpu_for_card(cpu_cards);
-    first_trick.is_tied_by_user = false;
-  }
+  ask_cards_from_players(is_user_foot,
+                         user_cards, cpu_cards,
+                         &user_card, &cpu_card,
+                         &first_trick);
 
-  if (cpu_card.value > user_card.value)
-  {
-    first_trick.result = LOSE;
-    first_trick.is_tied_by_user = false;
-  }
-  else if (cpu_card.value < user_card.value)
-  {
-    first_trick.result = WIN;
-    first_trick.is_tied_by_user = false;
-  }
-  else
-  {
-    first_trick.result = TIE;
-  }
+  set_trick_result(user_card, cpu_card, &first_trick);
 
   char cardname[10];
   printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
