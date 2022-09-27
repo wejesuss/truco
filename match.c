@@ -73,9 +73,39 @@ int show_player_cards(card *player_cards)
   return available;
 }
 
+card ask_cpu_for_card(card *cpu_cards)
+{
+  show_player_cards(cpu_cards);
+
+  int index = rand() % TOTAL_HAND_CARDS_NUMBER;
+  card card = cpu_cards[index];
+
+  while (!card.available)
+  {
+    index = rand() % TOTAL_HAND_CARDS_NUMBER;
+    card = cpu_cards[index];
+  }
+
+  cpu_cards[index].available = false;
+  return card;
+}
+
 trick play_first_trick(player *user_ptr, player *cpu_ptr)
 {
+  card *user_cards = (*user_ptr).cards;
+  card *cpu_cards = (*cpu_ptr).cards;
+
+  card user_card, cpu_card;
   trick first_trick;
+
+  if (true)
+  {
+    cpu_card = ask_cpu_for_card(cpu_cards);
+  }
+  else
+  {
+    cpu_card = ask_cpu_for_card(cpu_cards);
+  }
 
   return first_trick;
 }
