@@ -90,11 +90,8 @@ card ask_cpu_for_card(card *cpu_cards)
   return card;
 }
 
-card ask_user_for_card(card *user_cards)
+void show_instruction(int available)
 {
-  printf("\nSuas cartas são: ");
-  int available = show_player_cards(user_cards);
-
   if (available > 1)
   {
     printf("\nEscolha uma carta (1 a %i): ", available);
@@ -103,6 +100,14 @@ card ask_user_for_card(card *user_cards)
   {
     printf("\nEscolha uma carta (1): ");
   }
+}
+
+card ask_user_for_card(card *user_cards)
+{
+  printf("\nSuas cartas são: ");
+  int available = show_player_cards(user_cards);
+
+  show_instruction(available);
 
   int choose = 0, pos = 0, found = 0;
   card card;
@@ -112,14 +117,7 @@ card ask_user_for_card(card *user_cards)
   {
     if (choose < 1 || choose > available)
     {
-      if (available > 1)
-      {
-        printf("\nEscolha uma carta (1 a %i): ", available);
-      }
-      else
-      {
-        printf("\nEscolha uma carta (1): ");
-      }
+      show_instruction(available);
 
       scanf("%i", &choose);
       continue;
