@@ -85,22 +85,22 @@ trick play_first_trick(player *user_ptr, player *cpu_ptr)
   return first_trick;
 }
 
-void ask_cards_from_players(bool is_user_foot,
+void ask_cards_from_players(bool is_user_turn,
                             card *user_cards, card *cpu_cards,
                             card *user_card, card *cpu_card,
-                            trick *first_trick)
+                            trick *trick)
 {
-  if (is_user_foot)
+  if (is_user_turn)
   {
-    *cpu_card = ask_cpu_for_card(cpu_cards);
     *user_card = ask_user_for_card(user_cards);
-    first_trick->is_tied_by_user = true;
+    *cpu_card = ask_cpu_for_card(cpu_cards);
+    trick->is_tied_by_user = false;
   }
   else
   {
-    *user_card = ask_user_for_card(user_cards);
     *cpu_card = ask_cpu_for_card(cpu_cards);
-    first_trick->is_tied_by_user = false;
+    *user_card = ask_user_for_card(user_cards);
+    trick->is_tied_by_user = true;
   }
 }
 
@@ -195,21 +195,21 @@ void show_instruction(int available)
 }
 
 void set_trick_result(card user_card, card cpu_card,
-                      trick *first_trick)
+                      trick *trick)
 {
   if (cpu_card.value > user_card.value)
   {
-    first_trick->result = LOSE;
-    first_trick->is_tied_by_user = false;
+    trick->result = LOSE;
+    trick->is_tied_by_user = false;
   }
   else if (cpu_card.value < user_card.value)
   {
-    first_trick->result = WIN;
-    first_trick->is_tied_by_user = false;
+    trick->result = WIN;
+    trick->is_tied_by_user = false;
   }
   else
   {
-    first_trick->result = TIE;
+    trick->result = TIE;
   }
 }
 
