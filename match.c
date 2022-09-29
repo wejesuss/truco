@@ -15,6 +15,16 @@ typedef struct trick
   bool is_tied_by_user;
 } trick;
 
+int show_player_cards(card *player_cards);
+void show_instruction(int available);
+card ask_cpu_for_card(card *cpu_cards);
+card ask_user_for_card(card *user_cards);
+void ask_cards_from_players(bool is_user_foot,
+                            card *user_cards, card *cpu_cards,
+                            card *user_card, card *cpu_card,
+                            trick *first_trick);
+void set_trick_result(card user_card, card cpu_card,
+                      trick *first_trick);
 trick play_first_trick(player *user_ptr, player *cpu_ptr);
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
@@ -35,10 +45,6 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
   trick tricks[3];
   tricks[0] = play_first_trick(user_ptr, cpu_ptr);
-  // show player cards
-  // ask for a card
-  // verify results
-  // store on tricks
 
   // show player cards
   // ask for a card to previous winner (or "cangador")
@@ -53,24 +59,45 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   (*user_tentos) += 2;
 }
 
-int show_player_cards(card *player_cards)
+trick play_first_trick(player *user_ptr, player *cpu_ptr)
 {
-  char cardname[15];
-  int available = 0;
-  for (size_t i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
+  card *user_cards = (*user_ptr).cards;
+  card *cpu_cards = (*cpu_ptr).cards;
+
+  card user_card, cpu_card;
+  trick first_trick;
+
+  ask_cards_from_players(is_user_foot,
+                         user_cards, cpu_cards,
+                         &user_card, &cpu_card,
+                         &first_trick);
+
+  set_trick_result(user_card, cpu_card, &first_trick);
+
+  char cardname[10];
+  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
+  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
+
+  return first_trick;
+}
+
+void ask_cards_from_players(bool is_user_foot,
+                            card *user_cards, card *cpu_cards,
+                            card *user_card, card *cpu_card,
+                            trick *first_trick)
+{
+  if (is_user_foot)
   {
-    card card = player_cards[i];
-
-    if (card.available)
-    {
-      available++;
-      printf("%s ", get_card_name(&cardname[i * 5], card.suit, card.rank));
-    }
+    *cpu_card = ask_cpu_for_card(cpu_cards);
+    *user_card = ask_user_for_card(user_cards);
+    first_trick->is_tied_by_user = true;
   }
-
-  printf("\n");
-
-  return available;
+  else
+  {
+    *user_card = ask_user_for_card(user_cards);
+    *cpu_card = ask_cpu_for_card(cpu_cards);
+    first_trick->is_tied_by_user = false;
+  }
 }
 
 card ask_cpu_for_card(card *cpu_cards)
@@ -88,18 +115,6 @@ card ask_cpu_for_card(card *cpu_cards)
 
   cpu_cards[index].available = false;
   return card;
-}
-
-void show_instruction(int available)
-{
-  if (available > 1)
-  {
-    printf("\nEscolha uma carta (1 a %i): ", available);
-  }
-  else
-  {
-    printf("\nEscolha uma carta (1): ");
-  }
 }
 
 card ask_user_for_card(card *user_cards)
@@ -143,26 +158,40 @@ card ask_user_for_card(card *user_cards)
   return card;
 }
 
-void ask_cards_from_players(bool is_user_foot,
-                            card *user_cards, card *cpu_cards,
-                            card *user_card, card *cpu_card,
-                            trick *first_trick)
+int show_player_cards(card *player_cards)
 {
-  if (is_user_foot)
+  char cardname[15];
+  int available = 0;
+  for (size_t i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
-    *cpu_card = ask_cpu_for_card(cpu_cards);
-    *user_card = ask_user_for_card(user_cards);
-    first_trick->is_tied_by_user = true;
+    card card = player_cards[i];
+
+    if (card.available)
+    {
+      available++;
+      printf("%s ", get_card_name(&cardname[i * 5], card.suit, card.rank));
+    }
+  }
+
+  printf("\n");
+
+  return available;
+}
+
+void show_instruction(int available)
+{
+  if (available > 1)
+  {
+    printf("\nEscolha uma carta (1 a %i): ", available);
   }
   else
   {
-    *user_card = ask_user_for_card(user_cards);
-    *cpu_card = ask_cpu_for_card(cpu_cards);
-    first_trick->is_tied_by_user = false;
+    printf("\nEscolha uma carta (1): ");
   }
 }
 
-void set_trick_result(card user_card, card cpu_card, trick *first_trick)
+void set_trick_result(card user_card, card cpu_card,
+                      trick *first_trick)
 {
   if (cpu_card.value > user_card.value)
   {
@@ -178,26 +207,4 @@ void set_trick_result(card user_card, card cpu_card, trick *first_trick)
   {
     first_trick->result = TIE;
   }
-}
-
-trick play_first_trick(player *user_ptr, player *cpu_ptr)
-{
-  card *user_cards = (*user_ptr).cards;
-  card *cpu_cards = (*cpu_ptr).cards;
-
-  card user_card, cpu_card;
-  trick first_trick;
-
-  ask_cards_from_players(is_user_foot,
-                         user_cards, cpu_cards,
-                         &user_card, &cpu_card,
-                         &first_trick);
-
-  set_trick_result(user_card, cpu_card, &first_trick);
-
-  char cardname[10];
-  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
-  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
-
-  return first_trick;
 }
