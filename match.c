@@ -26,6 +26,8 @@ void ask_cards_from_players(bool is_user_foot,
 void set_trick_result(card user_card, card cpu_card,
                       trick *first_trick);
 trick play_first_trick(player *user_ptr, player *cpu_ptr);
+bool check_user_turn(trick trick);
+trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn, trick first_trick);
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 {
@@ -45,6 +47,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
   trick tricks[3];
   tricks[0] = play_first_trick(user_ptr, cpu_ptr);
+  bool is_user_turn = check_user_turn(tricks[0]);
+  tricks[1] = play_second_trick(user_ptr, cpu_ptr, is_user_turn, tricks[0]);
 
   // show player cards
   // ask for a card to previous winner (or "cangador")
@@ -207,4 +211,46 @@ void set_trick_result(card user_card, card cpu_card,
   {
     first_trick->result = TIE;
   }
+}
+
+bool check_user_turn(trick trick)
+{
+  enum round_result result = trick.result;
+
+  switch (result)
+  {
+  case WIN:
+    return true;
+
+  case LOSE:
+    return false;
+
+  case TIE:
+    return trick.is_tied_by_user;
+
+  default:
+    return false;
+  }
+}
+
+trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn, trick first_trick)
+{
+  card *user_cards = (*user_ptr).cards;
+  card *cpu_cards = (*cpu_ptr).cards;
+
+  card user_card, cpu_card;
+  trick second_trick;
+
+  ask_cards_from_players(is_user_turn,
+                         user_cards, cpu_cards,
+                         &user_card, &cpu_card,
+                         &second_trick);
+
+  set_trick_result(user_card, cpu_card, &second_trick);
+
+  char cardname[10];
+  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
+  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
+
+  return second_trick;
 }
