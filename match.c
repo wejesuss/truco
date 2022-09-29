@@ -71,7 +71,7 @@ trick play_first_trick(player *user_ptr, player *cpu_ptr)
   card user_card, cpu_card;
   trick first_trick;
 
-  ask_cards_from_players(is_user_foot,
+  ask_cards_from_players(!is_user_foot,
                          user_cards, cpu_cards,
                          &user_card, &cpu_card,
                          &first_trick);
