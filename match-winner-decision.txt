@@ -1,0 +1,19 @@
+TIE = 0
+WIN = 1
+LOSE = 2
+
+TIE + TIE = 0
+LOSE + WIN = 3
+WIN + LOSE = 3
+
+WIN + TIE(1) = 1   (2)
+TIE(1) + WIN = 1   (2)
+WIN + WIN = 2
+
+LOSE + TIE(2) = 2  (4)
+TIE(2) + LOSE = 2  (4)
+LOSE + LOSE = 4
+
+
+
+
