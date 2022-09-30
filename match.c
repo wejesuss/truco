@@ -145,12 +145,12 @@ card ask_user_for_card(card *user_cards)
     card = user_cards[pos];
     if (card.available)
     {
-      user_cards[pos].available = false;
       found++;
     }
 
     if (found == choose)
     {
+      user_cards[pos].available = false;
       break;
     }
 
