@@ -16,4 +16,25 @@ LOSE + LOSE = 4
 
 
 
+TIE = 0
+WIN = 1
+LOSE = 2
 
+TIE  + TIE  + TIE  = 0
+
+LOSE + WIN  + WIN  = 4
+WIN  + LOSE + WIN  = 4
+WIN  + LOSE + TIE(1)  = 4
+
+LOSE + WIN  + LOSE = 5
+WIN  + LOSE + LOSE = 5
+LOSE + WIN  + TIE(2)  = 5
+
+// reduced (same for tie-tie and win/lose)
+LOSE + WIN (annulated) + WIN(1) = 1
+WIN + LOSE (annulated) + WIN(1) = 1
+WIN + LOSE (annulated) + TIE(1) = 1
+
+LOSE + WIN (annulated) + LOSE(2) = 2
+WIN + LOSE (annulated) + LOSE(2) = 2
+LOSE + WIN (annulated) + TIE(2)  = 2
