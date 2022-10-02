@@ -267,6 +267,9 @@ trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
 
 enum round_result check_winner(trick *tricks)
 {
+  const int USER_VICTORY = 2;
+  const int CPU_VICTORY = 4;
+
   int match_score = 0;
 
   if (tricks[0].result == TIE)
@@ -289,11 +292,11 @@ enum round_result check_winner(trick *tricks)
 
   printf("%i\n", match_score);
 
-  if (match_score == 2)
+  if (match_score == USER_VICTORY)
   {
     return WIN;
   }
-  else if (match_score == 4)
+  else if (match_score == CPU_VICTORY)
   {
     return LOSE;
   }
