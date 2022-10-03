@@ -28,8 +28,8 @@ void set_trick_result(card user_card, card cpu_card,
 trick play_first_trick(player *user_ptr, player *cpu_ptr);
 bool check_user_turn(trick trick);
 trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
-enum round_result check_winner(trick *tricks);
 trick play_third_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
+enum round_result check_winner(trick *tricks, bool check_third_trick);
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 {
@@ -47,12 +47,15 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     draw_cards(cards, user_ptr, cpu_ptr);
   }
 
-  trick tricks[3];
+  trick tricks[3] = {
+      {.is_tied_by_user = false, .result = TIE},
+      {.is_tied_by_user = false, .result = TIE},
+      {.is_tied_by_user = false, .result = TIE}};
   enum round_result current_result = TIE;
   tricks[0] = play_first_trick(user_ptr, cpu_ptr);
   bool is_user_turn = check_user_turn(tricks[0]);
   tricks[1] = play_second_trick(user_ptr, cpu_ptr, is_user_turn);
-  current_result = check_winner(tricks);
+  current_result = check_winner(tricks, false);
 
   while (true)
   {
@@ -71,7 +74,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     {
       is_user_turn = check_user_turn(tricks[1]);
       tricks[2] = play_third_trick(user_ptr, cpu_ptr, is_user_turn);
-      current_result = check_winner(tricks);
+      current_result = check_winner(tricks, true);
       trick++;
     }
   }
@@ -274,7 +277,7 @@ trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
   return second_trick;
 }
 
-enum round_result check_winner(trick *tricks)
+enum round_result check_winner(trick *tricks, bool check_third_trick)
 {
   const int USER_VICTORY = 2;
   const int CPU_VICTORY = 4;
@@ -309,8 +312,18 @@ enum round_result check_winner(trick *tricks)
   {
     return LOSE;
   }
+  else if (check_third_trick)
+  {
+    // deciding winner using third trick or first if it's a tie
+    match_score = tricks[2].result == TIE ? tricks[0].result : tricks[2].result;
+
+    printf("Resultado: %i\n", match_score);
+
+    return match_score;
+  }
   else
   {
+    // in case only two tricks were played yet
     return TIE;
   }
 }
