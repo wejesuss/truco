@@ -290,7 +290,7 @@ enum round_result check_winner(trick *tricks)
     match_score += tricks[1].result;
   }
 
-  printf("%i\n", match_score);
+  printf("Resultado: %i\n", match_score);
 
   if (match_score == USER_VICTORY)
   {
