@@ -27,8 +27,9 @@ void set_trick_result(card user_card, card cpu_card,
                       trick *first_trick);
 trick play_first_trick(player *user_ptr, player *cpu_ptr);
 bool check_user_turn(trick trick);
-trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn, trick first_trick);
-enum round_result check_winner(trick *tricks);
+trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
+trick play_third_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
+enum round_result check_winner(trick *tricks, bool check_third_trick);
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 {
@@ -46,26 +47,37 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     draw_cards(cards, user_ptr, cpu_ptr);
   }
 
-  trick tricks[3];
+  trick tricks[3] = {
+      {.is_tied_by_user = false, .result = TIE},
+      {.is_tied_by_user = false, .result = TIE},
+      {.is_tied_by_user = false, .result = TIE}};
   enum round_result current_result = TIE;
   tricks[0] = play_first_trick(user_ptr, cpu_ptr);
   bool is_user_turn = check_user_turn(tricks[0]);
-  tricks[1] = play_second_trick(user_ptr, cpu_ptr, is_user_turn, tricks[0]);
-  current_result = check_winner(tricks);
+  tricks[1] = play_second_trick(user_ptr, cpu_ptr, is_user_turn);
+  current_result = check_winner(tricks, false);
 
-  if (current_result == WIN)
+  while (true)
   {
-    (*user_tentos) += 2;
+    int trick = 1;
+    if (current_result == WIN)
+    {
+      (*user_tentos) += 2;
+      break;
+    }
+    else if (current_result == LOSE)
+    {
+      (*cpu_tentos) += 2;
+      break;
+    }
+    else if (current_result == TIE && trick < 2)
+    {
+      is_user_turn = check_user_turn(tricks[1]);
+      tricks[2] = play_third_trick(user_ptr, cpu_ptr, is_user_turn);
+      current_result = check_winner(tricks, true);
+      trick++;
+    }
   }
-  else if (current_result == LOSE)
-  {
-    (*cpu_tentos) += 2;
-  }
-
-  // show player cards
-  // ask for a card to previous winner (or "cangador")
-  // verify results
-  // store on tricks
 
   // cards should be made available again here
   reset_deck(cards);
@@ -243,7 +255,7 @@ bool check_user_turn(trick trick)
   }
 }
 
-trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn, trick first_trick)
+trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
 {
   card *user_cards = (*user_ptr).cards;
   card *cpu_cards = (*cpu_ptr).cards;
@@ -265,8 +277,11 @@ trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn, tr
   return second_trick;
 }
 
-enum round_result check_winner(trick *tricks)
+enum round_result check_winner(trick *tricks, bool check_third_trick)
 {
+  const int USER_VICTORY = 2;
+  const int CPU_VICTORY = 4;
+
   int match_score = 0;
 
   if (tricks[0].result == TIE)
@@ -287,18 +302,50 @@ enum round_result check_winner(trick *tricks)
     match_score += tricks[1].result;
   }
 
-  printf("%i\n", match_score);
+  printf("Resultado: %i\n", match_score);
 
-  if (match_score == 2)
+  if (match_score == USER_VICTORY)
   {
     return WIN;
   }
-  else if (match_score == 4)
+  else if (match_score == CPU_VICTORY)
   {
     return LOSE;
   }
+  else if (check_third_trick)
+  {
+    // deciding winner using third trick or first if it's a tie
+    match_score = tricks[2].result == TIE ? tricks[0].result : tricks[2].result;
+
+    printf("Resultado: %i\n", match_score);
+
+    return match_score;
+  }
   else
   {
+    // in case only two tricks were played yet
     return TIE;
   }
+}
+
+trick play_third_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
+{
+  card *user_cards = (*user_ptr).cards;
+  card *cpu_cards = (*cpu_ptr).cards;
+
+  card user_card, cpu_card;
+  trick third_trick;
+
+  ask_cards_from_players(is_user_turn,
+                         user_cards, cpu_cards,
+                         &user_card, &cpu_card,
+                         &third_trick);
+
+  set_trick_result(user_card, cpu_card, &third_trick);
+
+  char cardname[10];
+  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
+  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
+
+  return third_trick;
 }
