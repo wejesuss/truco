@@ -48,19 +48,18 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     draw_cards(cards, user_ptr, cpu_ptr);
   }
 
-  trick tricks[3] = {
-      {.is_tied_by_user = false, .result = TIE},
-      {.is_tied_by_user = false, .result = TIE},
-      {.is_tied_by_user = false, .result = TIE}};
+  trick tricks[3];
+  int trick = 0;
   enum round_result current_result = TIE;
-  tricks[0] = play_trick(user_ptr, cpu_ptr, !is_user_foot);
-  bool is_user_turn = check_user_turn(tricks[0]);
-  tricks[1] = play_trick(user_ptr, cpu_ptr, is_user_turn);
-  current_result = check_winner(tricks, false);
+  bool is_user_turn = !is_user_foot;
+  tricks[trick] = play_trick(user_ptr, cpu_ptr, is_user_turn);
 
   while (true)
   {
-    int trick = 1;
+    is_user_turn = check_user_turn(tricks[trick++]);
+    tricks[trick] = play_trick(user_ptr, cpu_ptr, is_user_turn);
+    current_result = check_winner(tricks, trick < 2 ? false : true);
+
     if (current_result == WIN)
     {
       (*user_tentos) += 2;
@@ -71,12 +70,9 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       (*cpu_tentos) += 2;
       break;
     }
-    else if (current_result == TIE && trick < 2)
+    else if (trick == 2)
     {
-      is_user_turn = check_user_turn(tricks[1]);
-      tricks[2] = play_trick(user_ptr, cpu_ptr, is_user_turn);
-      current_result = check_winner(tricks, true);
-      trick++;
+      break;
     }
   }
 
