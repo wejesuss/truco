@@ -25,6 +25,7 @@ void ask_cards_from_players(bool is_user_foot,
                             trick *first_trick);
 void set_trick_result(card user_card, card cpu_card,
                       trick *first_trick);
+trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
 trick play_first_trick(player *user_ptr, player *cpu_ptr);
 bool check_user_turn(trick trick);
 trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
@@ -52,9 +53,9 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       {.is_tied_by_user = false, .result = TIE},
       {.is_tied_by_user = false, .result = TIE}};
   enum round_result current_result = TIE;
-  tricks[0] = play_first_trick(user_ptr, cpu_ptr);
+  tricks[0] = play_trick(user_ptr, cpu_ptr, !is_user_foot);
   bool is_user_turn = check_user_turn(tricks[0]);
-  tricks[1] = play_second_trick(user_ptr, cpu_ptr, is_user_turn);
+  tricks[1] = play_trick(user_ptr, cpu_ptr, is_user_turn);
   current_result = check_winner(tricks, false);
 
   while (true)
@@ -73,7 +74,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     else if (current_result == TIE && trick < 2)
     {
       is_user_turn = check_user_turn(tricks[1]);
-      tricks[2] = play_third_trick(user_ptr, cpu_ptr, is_user_turn);
+      tricks[2] = play_trick(user_ptr, cpu_ptr, is_user_turn);
       current_result = check_winner(tricks, true);
       trick++;
     }
@@ -85,26 +86,26 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   is_user_foot = !is_user_foot;
 }
 
-trick play_first_trick(player *user_ptr, player *cpu_ptr)
+trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
 {
   card *user_cards = (*user_ptr).cards;
   card *cpu_cards = (*cpu_ptr).cards;
 
   card user_card, cpu_card;
-  trick first_trick;
+  trick trick;
 
-  ask_cards_from_players(!is_user_foot,
+  ask_cards_from_players(is_user_turn,
                          user_cards, cpu_cards,
                          &user_card, &cpu_card,
-                         &first_trick);
+                         &trick);
 
-  set_trick_result(user_card, cpu_card, &first_trick);
+  set_trick_result(user_card, cpu_card, &trick);
 
   char cardname[10];
   printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
   printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
 
-  return first_trick;
+  return trick;
 }
 
 void ask_cards_from_players(bool is_user_turn,
@@ -255,28 +256,6 @@ bool check_user_turn(trick trick)
   }
 }
 
-trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
-{
-  card *user_cards = (*user_ptr).cards;
-  card *cpu_cards = (*cpu_ptr).cards;
-
-  card user_card, cpu_card;
-  trick second_trick;
-
-  ask_cards_from_players(is_user_turn,
-                         user_cards, cpu_cards,
-                         &user_card, &cpu_card,
-                         &second_trick);
-
-  set_trick_result(user_card, cpu_card, &second_trick);
-
-  char cardname[10];
-  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
-  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
-
-  return second_trick;
-}
-
 enum round_result check_winner(trick *tricks, bool check_third_trick)
 {
   const int USER_VICTORY = 2;
@@ -326,26 +305,4 @@ enum round_result check_winner(trick *tricks, bool check_third_trick)
     // in case only two tricks were played yet
     return TIE;
   }
-}
-
-trick play_third_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
-{
-  card *user_cards = (*user_ptr).cards;
-  card *cpu_cards = (*cpu_ptr).cards;
-
-  card user_card, cpu_card;
-  trick third_trick;
-
-  ask_cards_from_players(is_user_turn,
-                         user_cards, cpu_cards,
-                         &user_card, &cpu_card,
-                         &third_trick);
-
-  set_trick_result(user_card, cpu_card, &third_trick);
-
-  char cardname[10];
-  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
-  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
-
-  return third_trick;
 }
