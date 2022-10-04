@@ -98,8 +98,8 @@ trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
   set_trick_result(user_card, cpu_card, &trick);
 
   char cardname[10];
-  printf("%i %s\n", user_card.value, get_card_name(cardname, user_card.suit, user_card.rank));
-  printf("%i %s\n\n", cpu_card.value, get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank));
+  printf("%s (%i) vs ", get_card_name(cardname, user_card.suit, user_card.rank), user_card.value);
+  printf("%s (%i)\n\n", get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank), cpu_card.value);
 
   return trick;
 }
@@ -125,6 +125,7 @@ void ask_cards_from_players(bool is_user_turn,
 
 card ask_cpu_for_card(card *cpu_cards)
 {
+  printf("Cartas do CPU são: ");
   show_player_cards(cpu_cards);
 
   int index = rand() % TOTAL_HAND_CARDS_NUMBER;
@@ -137,12 +138,15 @@ card ask_cpu_for_card(card *cpu_cards)
   }
 
   cpu_cards[index].available = false;
+
+  printf("\n");
+
   return card;
 }
 
 card ask_user_for_card(card *user_cards)
 {
-  printf("\nSuas cartas são: ");
+  printf("Suas cartas são: ");
   int available = show_player_cards(user_cards);
 
   show_instruction(available);
@@ -277,22 +281,25 @@ enum round_result check_winner(trick *tricks, bool check_third_trick)
     match_score += tricks[1].result;
   }
 
-  printf("Resultado: %i\n", match_score);
-
   if (match_score == USER_VICTORY)
   {
+    printf("Você GANHOU essa mão\n\n");
+
     return WIN;
   }
   else if (match_score == CPU_VICTORY)
   {
+    printf("Você PERDEU essa mão\n\n");
+
     return LOSE;
   }
   else if (check_third_trick)
   {
     // deciding winner using third trick or first if it's a tie
     match_score = tricks[2].result == TIE ? tricks[0].result : tricks[2].result;
-
-    printf("Resultado: %i\n", match_score);
+    char *result = (match_score == WIN) ? "Você GANHOU essa mão\n" : (match_score == LOSE) ? "Você PERDEU essa mão\n"
+                                                                                           : "EMPATE\n";
+    printf("%s\n", result);
 
     return match_score;
   }
