@@ -1,5 +1,17 @@
 #include "./types.h"
 
+void show_final_victor(int user_tentos, int cpu_tentos)
+{
+  if (user_tentos >= 12)
+  {
+    printf("\nVocê GANHOU o jogo\n");
+  }
+  else
+  {
+    printf("\nVocê PERDEU o jogo\n");
+  }
+}
+
 int main(void)
 {
   srand(time(NULL));
@@ -21,7 +33,7 @@ int main(void)
     play_hand(cards, &user, &cpu);
   }
 
-  printf("%i %i\n", user_tentos, cpu_tentos);
+  show_final_victor(user_tentos, cpu_tentos);
 
   return 0;
 }
