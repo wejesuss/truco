@@ -1,16 +1,6 @@
 #include "./types.h"
 
-void show_final_victor(int user_tentos, int cpu_tentos)
-{
-  if (user_tentos >= 12)
-  {
-    printf("\nVocê GANHOU o jogo\n");
-  }
-  else
-  {
-    printf("\nVocê PERDEU o jogo\n");
-  }
-}
+void show_final_victor(int user_tentos, int cpu_tentos);
 
 int main(void)
 {
@@ -36,4 +26,16 @@ int main(void)
   show_final_victor(user_tentos, cpu_tentos);
 
   return 0;
+}
+
+void show_final_victor(int user_tentos, int cpu_tentos)
+{
+  if (user_tentos >= 12)
+  {
+    printf("\nVocê GANHOU o jogo\n");
+  }
+  else
+  {
+    printf("\nVocê PERDEU o jogo\n");
+  }
 }
