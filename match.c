@@ -72,6 +72,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     }
     else if (trick == 2)
     {
+      // third trick in case of tie-tie-tie
       break;
     }
   }
