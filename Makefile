@@ -1,4 +1,4 @@
 .PHONY: truco
 
 truco:
-		cc truco.c cards.c match.c -o truco
+		cc truco.c cards.c match.c players.c -o truco
