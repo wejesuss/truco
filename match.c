@@ -17,6 +17,7 @@ typedef struct trick
 
 int show_player_cards(card *player_cards);
 void show_instruction(int available);
+void show_played_cards(card user_card, card cpu_card);
 card ask_cpu_for_card(card *cpu_cards);
 card ask_user_for_card(card *user_cards);
 void ask_cards_from_players(bool is_user_foot,
@@ -97,10 +98,7 @@ trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
                          &trick);
 
   set_trick_result(user_card, cpu_card, &trick);
-
-  char cardname[10];
-  printf("%s (%i) vs ", get_card_name(cardname, user_card.suit, user_card.rank), user_card.value);
-  printf("%s (%i)\n\n", get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank), cpu_card.value);
+  show_played_cards(user_card, cpu_card);
 
   return trick;
 }
@@ -216,6 +214,13 @@ void show_instruction(int available)
   {
     printf("\nEscolha uma carta (1): ");
   }
+}
+
+void show_played_cards(card user_card, card cpu_card)
+{
+  char cardname[10];
+  printf("%s (%i) vs ", get_card_name(cardname, user_card.suit, user_card.rank), user_card.value);
+  printf("%s (%i)\n\n", get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank), cpu_card.value);
 }
 
 void set_trick_result(card user_card, card cpu_card,
