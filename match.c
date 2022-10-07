@@ -1,4 +1,4 @@
-#include "./types.h"
+#include "./players.h"
 
 bool is_user_foot = true;
 
@@ -15,11 +15,6 @@ typedef struct trick
   bool is_tied_by_user;
 } trick;
 
-int show_player_cards(card *player_cards);
-void show_instruction(int available);
-void show_played_cards(card user_card, card cpu_card);
-card ask_cpu_for_card(card *cpu_cards);
-card ask_user_for_card(card *user_cards);
 void ask_cards_from_players(bool is_user_foot,
                             card *user_cards, card *cpu_cards,
                             card *user_card, card *cpu_card,
@@ -120,107 +115,6 @@ void ask_cards_from_players(bool is_user_turn,
     *user_card = ask_user_for_card(user_cards);
     trick->is_tied_by_user = true;
   }
-}
-
-card ask_cpu_for_card(card *cpu_cards)
-{
-  printf("Cartas do CPU são: ");
-  show_player_cards(cpu_cards);
-
-  int index = rand() % TOTAL_HAND_CARDS_NUMBER;
-  card card = cpu_cards[index];
-
-  while (!card.available)
-  {
-    index = rand() % TOTAL_HAND_CARDS_NUMBER;
-    card = cpu_cards[index];
-  }
-
-  cpu_cards[index].available = false;
-
-  printf("\n");
-
-  return card;
-}
-
-card ask_user_for_card(card *user_cards)
-{
-  printf("Suas cartas são: ");
-  int available = show_player_cards(user_cards);
-
-  show_instruction(available);
-
-  int choose = 0, pos = 0, found = 0;
-  card card;
-
-  scanf("%i", &choose);
-  while (true)
-  {
-    if (choose < 1 || choose > available)
-    {
-      show_instruction(available);
-
-      scanf("%i", &choose);
-      continue;
-    }
-
-    card = user_cards[pos];
-    if (card.available)
-    {
-      found++;
-    }
-
-    if (found == choose)
-    {
-      user_cards[pos].available = false;
-      break;
-    }
-
-    pos++;
-  }
-
-  printf("\n");
-
-  return card;
-}
-
-int show_player_cards(card *player_cards)
-{
-  char cardname[15];
-  int available = 0;
-  for (size_t i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
-  {
-    card card = player_cards[i];
-
-    if (card.available)
-    {
-      available++;
-      printf("%s ", get_card_name(&cardname[i * 5], card.suit, card.rank));
-    }
-  }
-
-  printf("\n");
-
-  return available;
-}
-
-void show_instruction(int available)
-{
-  if (available > 1)
-  {
-    printf("\nEscolha uma carta (1 a %i): ", available);
-  }
-  else
-  {
-    printf("\nEscolha uma carta (1): ");
-  }
-}
-
-void show_played_cards(card user_card, card cpu_card)
-{
-  char cardname[10];
-  printf("%s (%i) vs ", get_card_name(cardname, user_card.suit, user_card.rank), user_card.value);
-  printf("%s (%i)\n\n", get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank), cpu_card.value);
 }
 
 void set_trick_result(card user_card, card cpu_card,
