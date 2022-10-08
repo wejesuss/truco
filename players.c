@@ -21,6 +21,14 @@ card ask_cpu_for_card(card *cpu_cards)
   return card;
 }
 
+void get_choice(int *choice)
+{
+  scanf("%i", choice);
+  char c;
+  while ((c = getchar()) != '\n' && c != EOF)
+    ;
+}
+
 card ask_user_for_card(card *user_cards)
 {
   printf("Suas cartas são: ");
@@ -28,17 +36,17 @@ card ask_user_for_card(card *user_cards)
 
   show_instruction(available);
 
-  int choose = 0, pos = 0, found = 0;
+  int choice = 0, pos = 0, found = 0;
   card card;
 
-  scanf("%i", &choose);
+  get_choice(&choice);
   while (true)
   {
-    if (choose < 1 || choose > available)
+    if (choice < 1 || choice > available)
     {
       show_instruction(available);
 
-      scanf("%i", &choose);
+      get_choice(&choice);
       continue;
     }
 
@@ -48,7 +56,7 @@ card ask_user_for_card(card *user_cards)
       found++;
     }
 
-    if (found == choose)
+    if (found == choice)
     {
       user_cards[pos].available = false;
       break;
