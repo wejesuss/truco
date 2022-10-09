@@ -21,12 +21,40 @@ card ask_cpu_for_card(card *cpu_cards)
   return card;
 }
 
-void get_choice(int *choice)
+void get_choice(player_action *action, int available)
 {
-  scanf("%i", choice);
+  show_instruction(available);
+
+  // reseting everything, no need to reset choice
+  (*action).ask_truco = false;
+  (*action).hide_card = false;
+
   char c;
-  while ((c = getchar()) != '\n' && c != EOF)
-    ;
+  while ((c = getchar()))
+  {
+    if (c == EOF || c == '\n')
+    {
+      break;
+    }
+
+    if (c == 't')
+    {
+      (*action).ask_truco = true;
+      continue;
+    }
+
+    if (c == '?' && available < 3)
+    {
+      (*action).hide_card = true;
+      continue;
+    }
+
+    if (c >= '1' && c <= '3')
+    {
+      // converting character to a number
+      (*action).choice = c - '0';
+    }
+  }
 }
 
 card ask_user_for_card(card *user_cards)
@@ -34,35 +62,42 @@ card ask_user_for_card(card *user_cards)
   printf("Suas cartas são: ");
   int available = show_player_cards(user_cards);
 
-  show_instruction(available);
+  player_action action = {
+      .choice = 0,
+      .ask_truco = false,
+      .hide_card = false};
 
-  int choice = 0, pos = 0, found = 0;
+  int pos = 0, found = 0;
   card card;
 
-  get_choice(&choice);
+  while (action.choice < 1 || action.choice > available)
+  {
+    get_choice(&action, available);
+  }
+
+  // get card from hand
   while (true)
   {
-    if (choice < 1 || choice > available)
-    {
-      show_instruction(available);
-
-      get_choice(&choice);
-      continue;
-    }
-
     card = user_cards[pos];
     if (card.available)
     {
       found++;
     }
 
-    if (found == choice)
+    if (found == action.choice)
     {
       user_cards[pos].available = false;
       break;
     }
 
     pos++;
+  }
+
+  if (action.hide_card)
+  {
+    card.value = facedown;
+    card.rank = facedown;
+    card.suit = facedown;
   }
 
   printf("\n");
@@ -92,6 +127,12 @@ int show_player_cards(card *player_cards)
 
 void show_instruction(int available)
 {
+  printf("\nPeça truco com 't'");
+  if (available != 3)
+  {
+    printf(" esconda uma carta com '?'");
+  }
+
   if (available > 1)
   {
     printf("\nEscolha uma carta (1 a %i): ", available);
