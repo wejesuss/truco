@@ -1,4 +1,4 @@
-#include "types.h"
+#include "./types.h"
 
 typedef struct player_action
 {
