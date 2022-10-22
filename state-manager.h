@@ -1,6 +1,5 @@
 enum states
 {
-  DEFAULT = -1,
   IDLE,
   CHECK_USER_TURN,
   SET_ASK_PLAYER_CARD,
