@@ -120,6 +120,31 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     }
   }
 
+  tricks[trick] = play_trick(user_ptr, cpu_ptr, is_user_turn);
+
+  while (true)
+  {
+    is_user_turn = check_user_turn(tricks[trick++]);
+    tricks[trick] = play_trick(user_ptr, cpu_ptr, is_user_turn);
+    current_result = check_winner(tricks, trick < 2 ? false : true);
+
+    if (current_result == WIN)
+    {
+      (*user_tentos) += 2;
+      break;
+    }
+    else if (current_result == LOSE)
+    {
+      (*cpu_tentos) += 2;
+      break;
+    }
+    else if (trick == 2)
+    {
+      // third trick in case of tie-tie-tie
+      break;
+    }
+  }
+
   // cards should be made available again here
   reset_deck(cards);
   // toggling who will shuffle the cards next
