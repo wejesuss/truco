@@ -55,7 +55,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   bool is_user_turn = !is_user_foot;
   card user_card, cpu_card;
 
-  while (trick < 3)
+  while (state != END_OF_MATCH)
   {
     state = get_state().current_state;
 
@@ -110,12 +110,50 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     case SHOW_PLAYED_CARDS:
       printf("SHOW_PLAYED_CARDS\n");
       show_played_cards(user_card, cpu_card);
-      update_state(IDLE);
+      update_state(CHECK_WINNER);
+      break;
+
+    case CHECK_WINNER:
+      printf("CHECK_WINNER\n");
+      if (trick >= 1)
+      {
+        current_result = check_winner(tricks, trick < 2 ? false : true);
+        update_state(UPDATE_WINNER_TENTOS);
+      }
+      else
+      {
+        update_state(IDLE);
+        trick++;
+      }
+
+      break;
+
+    case UPDATE_WINNER_TENTOS:
+      printf("UPDATE_WINNER_TENTOS\n");
+
+      state = IDLE;
+      if (current_result == WIN)
+      {
+        (*user_tentos) += 2;
+        state = END_OF_MATCH;
+      }
+      else if (current_result == LOSE)
+      {
+        (*cpu_tentos) += 2;
+        state = END_OF_MATCH;
+      }
+      else if (trick == 2)
+      {
+        state = END_OF_MATCH;
+      }
+
+      update_state(state);
       trick++;
       break;
 
     default:
       printf("default\n");
+      update_state(END_OF_MATCH);
       break;
     }
   }
