@@ -115,11 +115,13 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case CHECK_WINNER:
       printf("CHECK_WINNER\n");
+      // if it's second or third round
       if (trick >= 1)
       {
         current_result = check_winner(tricks, trick < 2 ? false : true);
         update_state(UPDATE_WINNER_TENTOS);
       }
+      // we don't have a winner with just one round
       else
       {
         update_state(IDLE);
@@ -130,22 +132,29 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case UPDATE_WINNER_TENTOS:
       printf("UPDATE_WINNER_TENTOS\n");
+      // deciding who has won (if so), updating the score
 
       state = IDLE;
+      // user wins
       if (current_result == WIN)
       {
         (*user_tentos) += 2;
         state = END_OF_MATCH;
       }
+      // cpu wins
       else if (current_result == LOSE)
       {
         (*cpu_tentos) += 2;
         state = END_OF_MATCH;
       }
+      // it's a tie; tie-tie-tie
       else if (trick == 2)
       {
         state = END_OF_MATCH;
       }
+
+      // game continues if no one has won
+      // on the second trick
 
       update_state(state);
       trick++;
