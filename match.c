@@ -57,8 +57,6 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
   while (state != END_OF_MATCH)
   {
-    state = get_state().current_state;
-
     switch (state)
     {
     case IDLE:
@@ -165,8 +163,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       update_state(END_OF_MATCH);
       break;
     }
-  }
 
+    state = get_state().current_state;
   }
 
   // cards should be made available again here
