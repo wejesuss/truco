@@ -167,6 +167,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     state = get_state().current_state;
   }
 
+  reset_state();
+
   // cards should be made available again here
   reset_deck(cards);
   // toggling who will shuffle the cards next

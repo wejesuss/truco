@@ -27,6 +27,15 @@ state update_state(enum states new_state)
   return match_state;
 }
 
+state reset_state()
+{
+  match_state.current_state = IDLE;
+  match_state.previous_state = IDLE;
+  match_state.asked_two_players = false;
+
+  return match_state;
+}
+
 bool asked_two_players()
 {
   return match_state.asked_two_players;

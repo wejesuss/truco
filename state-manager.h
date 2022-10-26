@@ -21,5 +21,6 @@ typedef struct state
 
 state get_state();
 state update_state(enum states new_state);
+state reset_state();
 void set_asked_two_players(enum states new_state);
 bool asked_two_players();
