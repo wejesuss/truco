@@ -16,17 +16,9 @@ typedef struct trick
   bool is_tied_by_user;
 } trick;
 
-void ask_cards_from_players(bool is_user_foot,
-                            card *user_cards, card *cpu_cards,
-                            card *user_card, card *cpu_card,
-                            trick *first_trick);
+bool check_user_turn(trick trick);
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,
                       trick *first_trick);
-trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
-trick play_first_trick(player *user_ptr, player *cpu_ptr);
-bool check_user_turn(trick trick);
-trick play_second_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
-trick play_third_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn);
 enum round_result check_winner(trick *tricks, bool check_third_trick);
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
@@ -173,44 +165,6 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   reset_deck(cards);
   // toggling who will shuffle the cards next
   is_user_foot = !is_user_foot;
-}
-
-trick play_trick(player *user_ptr, player *cpu_ptr, bool is_user_turn)
-{
-  card *user_cards = (*user_ptr).cards;
-  card *cpu_cards = (*cpu_ptr).cards;
-
-  card user_card, cpu_card;
-  trick trick;
-
-  ask_cards_from_players(is_user_turn,
-                         user_cards, cpu_cards,
-                         &user_card, &cpu_card,
-                         &trick);
-
-  set_trick_result(is_user_turn, user_card, cpu_card, &trick);
-  show_played_cards(user_card, cpu_card);
-
-  return trick;
-}
-
-void ask_cards_from_players(bool is_user_turn,
-                            card *user_cards, card *cpu_cards,
-                            card *user_card, card *cpu_card,
-                            trick *trick)
-{
-  if (is_user_turn)
-  {
-    *user_card = ask_user_for_card(user_cards);
-    *cpu_card = ask_cpu_for_card(cpu_cards);
-    trick->is_tied_by_user = false;
-  }
-  else
-  {
-    *cpu_card = ask_cpu_for_card(cpu_cards);
-    *user_card = ask_user_for_card(user_cards);
-    trick->is_tied_by_user = true;
-  }
 }
 
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,
