@@ -1,4 +1,4 @@
-#include "./types.h"
+#include "./players.h"
 
 void show_final_victor(int user_tentos, int cpu_tentos);
 
@@ -12,18 +12,15 @@ int main(void)
   card cards[TOTAL_CARDS_NUMBER];
   set_deck(cards);
 
-  player user, cpu;
-  int user_tentos = 0;
-  int cpu_tentos = 0;
+  player user = get_user(), cpu = get_cpu();
+  reset_players();
 
-  user.player_tentos = &user_tentos;
-  cpu.player_tentos = &cpu_tentos;
-  while (user_tentos < 12 && cpu_tentos < 12)
+  while ((*user.player_tentos) < 12 && *cpu.player_tentos < 12)
   {
     play_hand(cards, &user, &cpu);
   }
 
-  show_final_victor(user_tentos, cpu_tentos);
+  show_final_victor((*user.player_tentos), (*cpu.player_tentos));
 
   return 0;
 }

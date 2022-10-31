@@ -7,6 +7,9 @@ typedef struct player_action
   bool hide_card;
 } player_action;
 
+player get_user();
+player get_cpu();
+void reset_players();
 card ask_cpu_for_card(card *cpu_cards);
 card ask_user_for_card(card *user_cards);
 int show_player_cards(card *player_cards);

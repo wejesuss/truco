@@ -1,5 +1,26 @@
 #include "./players.h"
 
+player user, cpu;
+int user_tentos = 0;
+int cpu_tentos = 0;
+
+void reset_players()
+{
+  user_tentos = cpu_tentos = 0;
+}
+
+player get_user()
+{
+  user.player_tentos = &user_tentos;
+  return user;
+}
+
+player get_cpu()
+{
+  cpu.player_tentos = &cpu_tentos;
+  return cpu;
+}
+
 card ask_cpu_for_card(card *cpu_cards)
 {
   printf("Cartas do CPU são: ");
