@@ -21,6 +21,16 @@ player get_cpu()
   return cpu;
 }
 
+bool is_hand_of_ten()
+{
+  if (user_tentos == 10 || cpu_tentos == 10)
+  {
+    return true;
+  }
+
+  return false;
+}
+
 card ask_cpu_for_card(card *cpu_cards)
 {
   printf("Cartas do CPU são: ");
@@ -57,13 +67,13 @@ void get_choice(player_action *action, int available)
       break;
     }
 
-    if (c == 't')
+    if (c == 't' && !is_hand_of_ten())
     {
       (*action).ask_truco = true;
       continue;
     }
 
-    if (c == '?' && available < 3)
+    if (c == '?' && available != 3 && !is_hand_of_ten())
     {
       (*action).hide_card = true;
       continue;
@@ -147,7 +157,7 @@ int show_player_cards(card *player_cards)
 void show_instruction(int available)
 {
   printf("\nPeça truco com 't'");
-  if (available != 3)
+  if (available != 3 && !is_hand_of_ten())
   {
     printf(" esconda uma carta com '?'");
   }
