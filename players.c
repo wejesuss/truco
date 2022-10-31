@@ -4,6 +4,7 @@ card ask_cpu_for_card(card *cpu_cards)
 {
   printf("Cartas do CPU são: ");
   show_player_cards(cpu_cards);
+  printf("\n");
 
   int index = rand() % TOTAL_HAND_CARDS_NUMBER;
   card card = cpu_cards[index];
@@ -15,8 +16,6 @@ card ask_cpu_for_card(card *cpu_cards)
   }
 
   cpu_cards[index].available = false;
-
-  printf("\n");
 
   return card;
 }
@@ -61,6 +60,7 @@ card ask_user_for_card(card *user_cards)
 {
   printf("Suas cartas são: ");
   int available = show_player_cards(user_cards);
+  printf("\n");
 
   player_action action = {
       .choice = 0,
@@ -99,8 +99,6 @@ card ask_user_for_card(card *user_cards)
     card.rank = facedown;
     card.suit = facedown;
   }
-
-  printf("\n");
 
   return card;
 }
