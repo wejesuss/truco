@@ -79,7 +79,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case ASK_USER_CARD:
       printf("ASK_USER_CARD\n");
-      user_card = ask_user_for_card(user_cards);
+      player_action *user_action = get_user_action(user_cards);
+      reset_user_action();
       state = get_state().previous_state == ASK_CPU_CARD ? IDLE : ASK_CPU_CARD;
       update_state(state);
       break;

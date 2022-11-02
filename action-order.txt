@@ -1,0 +1,12 @@
+1t?
+1?t
+?t1
+?1t
+
+hide card then ask truco
+
+
+t1?
+t?1
+
+ask truco then hide card
