@@ -72,12 +72,10 @@ void set_next_user_action(enum action_type type, union action value)
     return;
   }
 
-  player_action *previous = user_action;
-  player_action *current = user_action->next;
-  while (current != NULL)
+  player_action *current = user_action;
+  while (current->next != NULL)
   {
-    previous = current;
-    current = user_action->next;
+    current = current->next;
   }
 
   player_action *next_action = malloc(sizeof(player_action));
@@ -91,19 +89,19 @@ void set_next_user_action(enum action_type type, union action value)
   next_action->type = type;
   if (type == play_card)
   {
-    user_action->value.choice = value.choice;
+    next_action->value.choice = value.choice;
   }
   else if (type == ask_truco)
   {
 
-    user_action->value.ask_truco = value.ask_truco;
+    next_action->value.ask_truco = value.ask_truco;
   }
   else
   {
-    user_action->value.hide_card = value.hide_card;
+    next_action->value.hide_card = value.hide_card;
   }
 
-  previous->next = next_action;
+  current->next = next_action;
 }
 
 bool is_hand_of_ten()
@@ -157,7 +155,7 @@ int get_choice(int available)
     {
       union action action = {.ask_truco = true};
       set_next_user_action(ask_truco, action);
-      bool asked_truco = true;
+      asked_truco = true;
       continue;
     }
 
@@ -165,7 +163,7 @@ int get_choice(int available)
     {
       union action action = {.hide_card = true};
       set_next_user_action(hide_card, action);
-      bool hid_card = true;
+      hid_card = true;
       continue;
     }
 
