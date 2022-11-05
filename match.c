@@ -80,6 +80,26 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     case ASK_USER_CARD:
       printf("ASK_USER_CARD\n");
       player_action *user_action = get_user_action(user_cards);
+      while (user_action != NULL)
+      {
+        if (user_action->type == play_card)
+        {
+          printf("play card\n");
+          printf("%i %i\n", user_action->type, user_action->value.choice);
+        }
+        else if (user_action->type == ask_truco)
+        {
+          printf("ask truco\n");
+          printf("%i %i\n", user_action->type, user_action->value.ask_truco);
+        }
+        else if (user_action->type == hide_card)
+        {
+          printf("hide card\n");
+          printf("%i %i\n", user_action->type, user_action->value.hide_card);
+        }
+
+        user_action = user_action->next;
+      }
 
       state = get_state().previous_state == ASK_CPU_CARD ? IDLE : ASK_CPU_CARD;
       update_state(state);

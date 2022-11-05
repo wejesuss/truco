@@ -3,6 +3,7 @@
 player user, cpu;
 int user_tentos = 0;
 int cpu_tentos = 0;
+
 player_action *user_action = NULL;
 
 void reset_players()
@@ -20,6 +21,12 @@ player get_cpu()
 {
   cpu.player_tentos = &cpu_tentos;
   return cpu;
+}
+
+void exit_game_on_player_action()
+{
+  fprintf(stderr, "Could not create player action\n");
+  exit(1);
 }
 
 void reset_user_action()
@@ -49,25 +56,12 @@ void set_next_user_action(enum action_type type, union action value)
     user_action = malloc(sizeof(player_action));
     if (user_action == NULL)
     {
-      fprintf(stderr, "Could not create player action\n");
-      exit(1);
+      exit_game_on_player_action();
     }
 
     user_action->next = NULL;
     user_action->type = type;
-    if (type == play_card)
-    {
-      user_action->value.choice = value.choice;
-    }
-    else if (type == ask_truco)
-    {
-
-      user_action->value.ask_truco = value.ask_truco;
-    }
-    else
-    {
-      user_action->value.hide_card = value.hide_card;
-    }
+    user_action->value = value;
 
     return;
   }
@@ -81,25 +75,12 @@ void set_next_user_action(enum action_type type, union action value)
   player_action *next_action = malloc(sizeof(player_action));
   if (next_action == NULL)
   {
-    fprintf(stderr, "Could not create player action\n");
-    exit(1);
+    exit_game_on_player_action();
   }
 
   next_action->next = NULL;
   next_action->type = type;
-  if (type == play_card)
-  {
-    next_action->value.choice = value.choice;
-  }
-  else if (type == ask_truco)
-  {
-
-    next_action->value.ask_truco = value.ask_truco;
-  }
-  else
-  {
-    next_action->value.hide_card = value.hide_card;
-  }
+  next_action->value = value;
 
   current->next = next_action;
 }
