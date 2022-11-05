@@ -4,8 +4,6 @@ player user, cpu;
 int user_tentos = 0;
 int cpu_tentos = 0;
 
-player_action *user_action = NULL;
-
 void reset_players()
 {
   user_tentos = cpu_tentos = 0;
@@ -21,68 +19,6 @@ player get_cpu()
 {
   cpu.player_tentos = &cpu_tentos;
   return cpu;
-}
-
-void exit_game_on_player_action()
-{
-  fprintf(stderr, "Could not create player action\n");
-  exit(1);
-}
-
-void reset_user_action()
-{
-  while (user_action != NULL)
-  {
-    player_action *current = user_action;
-    user_action = user_action->next;
-    free(current);
-  }
-}
-
-player_action get_next_action(player_action *prev_action)
-{
-  if (prev_action == NULL)
-  {
-    return *user_action;
-  }
-
-  return *prev_action->next;
-}
-
-void set_next_user_action(enum action_type type, union action value)
-{
-  if (user_action == NULL)
-  {
-    user_action = malloc(sizeof(player_action));
-    if (user_action == NULL)
-    {
-      exit_game_on_player_action();
-    }
-
-    user_action->next = NULL;
-    user_action->type = type;
-    user_action->value = value;
-
-    return;
-  }
-
-  player_action *current = user_action;
-  while (current->next != NULL)
-  {
-    current = current->next;
-  }
-
-  player_action *next_action = malloc(sizeof(player_action));
-  if (next_action == NULL)
-  {
-    exit_game_on_player_action();
-  }
-
-  next_action->next = NULL;
-  next_action->type = type;
-  next_action->value = value;
-
-  current->next = next_action;
 }
 
 bool is_hand_of_ten()
@@ -115,14 +51,17 @@ card ask_cpu_for_card(card *cpu_cards)
   return card;
 }
 
-int get_choice(int available)
+player_action get_choice(int available)
 {
   show_instruction(available);
 
   reset_user_action();
-  int choice = 0;
-  bool asked_truco = false;
-  bool hid_card = false;
+
+  player_action action = {
+      .choice = 0,
+      .asked_truco = false,
+      .asked_truco_first = false,
+      .hid_card = false};
 
   char c;
   while ((c = getchar()))
@@ -132,47 +71,51 @@ int get_choice(int available)
       break;
     }
 
-    if (c == 't' && !is_hand_of_ten() && !asked_truco)
+    if (c == 't' && !is_hand_of_ten() && !action.asked_truco)
     {
-      union action action = {.ask_truco = true};
-      set_next_user_action(ask_truco, action);
-      asked_truco = true;
+      action.asked_truco = true;
+
+      if (!action.hid_card && action.choice == 0)
+      {
+        action.asked_truco_first = true;
+      }
+
       continue;
     }
 
-    if (c == '?' && available != 3 && !is_hand_of_ten() && !hid_card)
+    if (c == '?' && available != 3 && !is_hand_of_ten() && !action.hid_card)
     {
-      union action action = {.hide_card = true};
-      set_next_user_action(hide_card, action);
-      hid_card = true;
+      action.hid_card = true;
       continue;
     }
 
-    if (c >= '1' && c <= '3' && choice == 0)
+    if (c >= '1' && c <= '3' && action.choice == 0)
     {
       // converting character to a number
-      choice = c - '0';
-      union action action = {.choice = choice};
-      set_next_user_action(play_card, action);
+      action.choice = c - '0';
     }
   }
 
-  return choice;
+  return action;
 }
 
-player_action *get_user_action(card *user_cards)
+player_action get_user_action(card *user_cards)
 {
   printf("Suas cartas são: ");
   int available = show_player_cards(user_cards);
   printf("\n");
 
-  int choice = 0;
+  player_action action = {
+      .choice = 0,
+      .asked_truco = false,
+      .asked_truco_first = false,
+      .hid_card = false};
   // int pos = 0, found = 0;
   // card card;
 
-  while (choice < 1 || choice > available)
+  while (action.choice < 1 || action.choice > available)
   {
-    choice = get_choice(available);
+    action = get_choice(available);
   }
 
   // get card from hand
@@ -193,7 +136,7 @@ player_action *get_user_action(card *user_cards)
   //   pos++;
   // }
 
-  return user_action;
+  return action;
 }
 
 int show_player_cards(card *player_cards)
