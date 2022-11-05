@@ -1,12 +1,30 @@
+play hid card then ask truco
+
 1t?
 1?t
 ?t1
 ?1t
 
-hide card then ask truco
+-> 1?t
 
+ask truco then play hid card
 
 t1?
 t?1
 
-ask truco then hide card
+-> t1?
+
+ask truco then play card
+
+t1
+
+play card then ask truco
+
+1t
+
+play card hid card
+
+1?
+?1
+
+-> 1?
