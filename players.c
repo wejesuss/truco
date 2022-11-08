@@ -55,8 +55,6 @@ player_action get_choice(int available)
 {
   show_instruction(available);
 
-  reset_user_action();
-
   player_action action = {
       .choice = 0,
       .asked_truco = false,
@@ -110,31 +108,11 @@ player_action get_user_action(card *user_cards)
       .asked_truco = false,
       .asked_truco_first = false,
       .hid_card = false};
-  // int pos = 0, found = 0;
-  // card card;
 
   while (action.choice < 1 || action.choice > available)
   {
     action = get_choice(available);
   }
-
-  // get card from hand
-  // while (true)
-  // {
-  //   card = user_cards[pos];
-  //   if (card.available)
-  //   {
-  //     found++;
-  //   }
-
-  //   if (found == choice)
-  //   {
-  //     user_cards[pos].available = false;
-  //     break;
-  //   }
-
-  //   pos++;
-  // }
 
   return action;
 }

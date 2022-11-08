@@ -89,11 +89,51 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       if (user_action.hid_card)
       {
         // choice first
+        int pos = 0, found = 0;
+        // get card from hand
+        while (true)
+        {
+          user_card = user_cards[pos];
+          if (user_card.available)
+          {
+            found++;
+          }
+
+          if (found == user_action.choice)
+          {
+            user_cards[pos].available = false;
+            break;
+          }
+
+          pos++;
+        }
+
         // hide after
+        user_card.rank = facedown;
+        user_card.suit = facedown;
+        user_card.value = facedown;
       }
       else
       {
         // choice first
+        int pos = 0, found = 0;
+        // get card from hand
+        while (true)
+        {
+          user_card = user_cards[pos];
+          if (user_card.available)
+          {
+            found++;
+          }
+
+          if (found == user_action.choice)
+          {
+            user_cards[pos].available = false;
+            break;
+          }
+
+          pos++;
+        }
       }
 
       if (user_action.asked_truco && !user_action.asked_truco_first)
