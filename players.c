@@ -1,9 +1,41 @@
 #include "./players.h"
 
+player user, cpu;
+int user_tentos = 0;
+int cpu_tentos = 0;
+
+void reset_players()
+{
+  user_tentos = cpu_tentos = 0;
+}
+
+player get_user()
+{
+  user.player_tentos = &user_tentos;
+  return user;
+}
+
+player get_cpu()
+{
+  cpu.player_tentos = &cpu_tentos;
+  return cpu;
+}
+
+bool is_hand_of_ten()
+{
+  if (user_tentos == 10 || cpu_tentos == 10)
+  {
+    return true;
+  }
+
+  return false;
+}
+
 card ask_cpu_for_card(card *cpu_cards)
 {
   printf("Cartas do CPU são: ");
   show_player_cards(cpu_cards);
+  printf("\n");
 
   int index = rand() % TOTAL_HAND_CARDS_NUMBER;
   card card = cpu_cards[index];
@@ -16,18 +48,18 @@ card ask_cpu_for_card(card *cpu_cards)
 
   cpu_cards[index].available = false;
 
-  printf("\n");
-
   return card;
 }
 
-void get_choice(player_action *action, int available)
+player_action get_choice(int available)
 {
   show_instruction(available);
 
-  // reseting everything, no need to reset choice
-  (*action).ask_truco = false;
-  (*action).hide_card = false;
+  player_action action = {
+      .choice = 0,
+      .asked_truco = false,
+      .asked_truco_first = false,
+      .hid_card = false};
 
   char c;
   while ((c = getchar()))
@@ -37,72 +69,52 @@ void get_choice(player_action *action, int available)
       break;
     }
 
-    if (c == 't')
+    if (c == 't' && !is_hand_of_ten() && !action.asked_truco)
     {
-      (*action).ask_truco = true;
+      action.asked_truco = true;
+
+      if (!action.hid_card && action.choice == 0)
+      {
+        action.asked_truco_first = true;
+      }
+
       continue;
     }
 
-    if (c == '?' && available < 3)
+    if (c == '?' && available != 3 && !is_hand_of_ten() && !action.hid_card)
     {
-      (*action).hide_card = true;
+      action.hid_card = true;
       continue;
     }
 
-    if (c >= '1' && c <= '3')
+    if (c >= '1' && c <= '3' && action.choice == 0)
     {
       // converting character to a number
-      (*action).choice = c - '0';
+      action.choice = c - '0';
     }
   }
+
+  return action;
 }
 
-card ask_user_for_card(card *user_cards)
+player_action get_user_action(card *user_cards)
 {
   printf("Suas cartas são: ");
   int available = show_player_cards(user_cards);
+  printf("\n");
 
   player_action action = {
       .choice = 0,
-      .ask_truco = false,
-      .hide_card = false};
-
-  int pos = 0, found = 0;
-  card card;
+      .asked_truco = false,
+      .asked_truco_first = false,
+      .hid_card = false};
 
   while (action.choice < 1 || action.choice > available)
   {
-    get_choice(&action, available);
+    action = get_choice(available);
   }
 
-  // get card from hand
-  while (true)
-  {
-    card = user_cards[pos];
-    if (card.available)
-    {
-      found++;
-    }
-
-    if (found == action.choice)
-    {
-      user_cards[pos].available = false;
-      break;
-    }
-
-    pos++;
-  }
-
-  if (action.hide_card)
-  {
-    card.value = facedown;
-    card.rank = facedown;
-    card.suit = facedown;
-  }
-
-  printf("\n");
-
-  return card;
+  return action;
 }
 
 int show_player_cards(card *player_cards)
@@ -128,7 +140,7 @@ int show_player_cards(card *player_cards)
 void show_instruction(int available)
 {
   printf("\nPeça truco com 't'");
-  if (available != 3)
+  if (available != 3 && !is_hand_of_ten())
   {
     printf(" esconda uma carta com '?'");
   }
