@@ -10,6 +10,8 @@
 static state match_state = {
     .current_state = IDLE,
     .previous_state = IDLE,
+    .current_asking_player = NO_PLAYER_ASKING_TRUCO,
+    .previous_asking_player = NO_PLAYER_ASKING_TRUCO,
     .asked_two_players = false};
 
 state get_state()
@@ -31,6 +33,8 @@ state reset_state()
 {
   match_state.current_state = IDLE;
   match_state.previous_state = IDLE;
+  match_state.current_asking_player = NO_PLAYER_ASKING_TRUCO;
+  match_state.previous_asking_player = NO_PLAYER_ASKING_TRUCO;
   match_state.asked_two_players = false;
 
   return match_state;
@@ -50,4 +54,20 @@ void set_asked_two_players(enum states new_state)
   bool asked_one_player_previously = previous_state == ASK_USER_CARD || previous_state == ASK_CPU_CARD;
   // if two players have already played a card
   match_state.asked_two_players = asked_one_player_recently && asked_one_player_previously;
+}
+
+enum calltruco get_current_asking_player()
+{
+  return match_state.current_asking_player;
+}
+
+enum calltruco get_previous_asking_player()
+{
+  return match_state.previous_asking_player;
+}
+
+void set_asking_player(enum calltruco new_asking_player)
+{
+  match_state.previous_asking_player = match_state.current_asking_player;
+  match_state.current_asking_player = new_asking_player;
 }

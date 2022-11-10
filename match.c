@@ -87,10 +87,10 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       if (user_action.asked_truco_first)
       {
         enum truco_options option;
-        enum calltruco current_asking_player = NO_PLAYER_ASKING_TRUCO;
-        enum calltruco previous_asking_player = NO_PLAYER_ASKING_TRUCO;
 
-        current_asking_player = USER_ASKING_TRUCO;
+        set_asking_player(USER_ASKING_TRUCO);
+        enum calltruco current_asking_player = get_current_asking_player();
+        enum calltruco previous_asking_player = get_previous_asking_player();
 
         while (current_asking_player != previous_asking_player)
         {
@@ -122,13 +122,16 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
           // accept or retruco
           raise_stake(&stake);
-          previous_asking_player = current_asking_player;
-          current_asking_player = current_asking_player == USER_ASKING_TRUCO ? CPU_ASKING_TRUCO : USER_ASKING_TRUCO;
 
           if (option != retruco)
           {
             break;
           }
+
+          enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO ? CPU_ASKING_TRUCO : USER_ASKING_TRUCO;
+          set_asking_player(new_asking_player);
+          previous_asking_player = get_previous_asking_player();
+          current_asking_player = get_current_asking_player();
         }
 
         if (option == deny)
