@@ -168,7 +168,7 @@ enum truco_options ask_user_truco()
   char c;
   while (!can_stop_getting_char)
   {
-    printf("O que quer fazer (n/s/t)? \n");
+    printf("O que quer fazer (n/s/t)? ");
     c = getchar();
 
     if (c == 'n')
