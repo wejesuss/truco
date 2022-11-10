@@ -16,6 +16,7 @@ typedef struct trick
   bool is_tied_by_user;
 } trick;
 
+void raise_stake(int *current_stake);
 bool check_user_turn(trick trick);
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,
                       trick *first_trick);
@@ -28,6 +29,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
   int *cpu_tentos = (*cpu_ptr).player_tentos;
   card *cpu_cards = (*cpu_ptr).cards;
+
+  int stake = 2;
 
   // cards array should be pushed here for each player (randomly for the first card)
   shuffle_cards(cards);
@@ -83,7 +86,55 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       player_action user_action = get_user_action(user_cards);
       if (user_action.asked_truco_first)
       {
-        // ask truco
+        enum truco_options option;
+        enum calltruco current_asking_player = NO_PLAYER_ASKING_TRUCO;
+        enum calltruco previous_asking_player = NO_PLAYER_ASKING_TRUCO;
+
+        current_asking_player = USER_ASKING_TRUCO;
+
+        while (current_asking_player != previous_asking_player)
+        {
+          if (current_asking_player == USER_ASKING_TRUCO)
+          {
+            option = ask_cpu_truco();
+          }
+          else
+          {
+            option = ask_user_truco();
+          }
+
+          if (option == deny)
+          {
+            if (current_asking_player == USER_ASKING_TRUCO)
+            {
+              // set user as winner
+              current_result = WIN;
+            }
+            else
+            {
+              // set cpu as winner
+              current_result = LOSE;
+            }
+
+            update_state(UPDATE_WINNER_TENTOS);
+            break;
+          }
+
+          // accept or retruco
+          raise_stake(&stake);
+          previous_asking_player = current_asking_player;
+          current_asking_player = current_asking_player == USER_ASKING_TRUCO ? CPU_ASKING_TRUCO : USER_ASKING_TRUCO;
+
+          if (option != retruco)
+          {
+            break;
+          }
+        }
+
+        if (option == deny)
+        {
+          break;
+        }
       }
 
       if (user_action.hid_card)
@@ -189,13 +240,13 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       // user wins
       if (current_result == WIN)
       {
-        (*user_tentos) += 2;
+        (*user_tentos) += stake;
         state = END_OF_MATCH;
       }
       // cpu wins
       else if (current_result == LOSE)
       {
-        (*cpu_tentos) += 2;
+        (*cpu_tentos) += stake;
         state = END_OF_MATCH;
       }
       // it's a tie; tie-tie-tie
@@ -226,6 +277,23 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   reset_deck(cards);
   // toggling who will shuffle the cards next
   is_user_foot = !is_user_foot;
+}
+
+void raise_stake(int *current_stake)
+{
+  if (*current_stake < 12)
+  {
+    switch (*current_stake)
+    {
+    case 4:
+      *current_stake += 4;
+      break;
+
+    default:
+      *current_stake += 2;
+      break;
+    }
+  }
 }
 
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,

@@ -12,6 +12,13 @@ enum states
   UPDATE_WINNER_TENTOS
 };
 
+enum calltruco
+{
+  NO_PLAYER_ASKING_TRUCO,
+  USER_ASKING_TRUCO,
+  CPU_ASKING_TRUCO
+};
+
 typedef struct state
 {
   enum states current_state;

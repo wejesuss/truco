@@ -137,6 +137,65 @@ int show_player_cards(card *player_cards)
   return available;
 }
 
+enum truco_options ask_cpu_truco()
+{
+  // pick a random number
+  bool accepted = rand() % 2;
+  // use it to decide wheter or not truco was accepted
+  if (!accepted)
+  {
+    return deny;
+  }
+
+  // if accepted, pick another random number
+  bool ask_truco = rand() % 2;
+  // use it to decide if cpu will retruco
+  if (ask_truco)
+  {
+    return retruco;
+  }
+
+  return accept;
+}
+
+enum truco_options ask_user_truco()
+{
+  printf("CPU está chamando truco");
+  printf(" deseja correr (n) aceitar (s) ou retrucar (t)?\n");
+
+  enum truco_options option;
+  bool can_stop_getting_char = false;
+  char c;
+  while (!can_stop_getting_char)
+  {
+    printf("O que quer fazer (n/s/t)? \n");
+    c = getchar();
+
+    if (c == 'n')
+    {
+      option = deny;
+      can_stop_getting_char = true;
+    }
+
+    if (c == 's')
+    {
+      option = accept;
+      can_stop_getting_char = true;
+    }
+
+    if (c == 't')
+    {
+      option = retruco;
+      can_stop_getting_char = true;
+    }
+  }
+
+  while ((c = getchar()) != EOF && c != '\n')
+    ;
+
+  return option;
+}
+
 void show_instruction(int available)
 {
   printf("\nPeça truco com 't'");
