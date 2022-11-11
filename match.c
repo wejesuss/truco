@@ -84,7 +84,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       printf("ASK_USER_CARD\n");
 
       player_action user_action = get_user_action(user_cards);
-      if (user_action.asked_truco_first)
+
+      if (user_action.asked_truco)
       {
         enum truco_options option;
 
@@ -140,59 +141,32 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
         }
       }
 
-      if (user_action.hid_card)
+      // choice first
+      int pos = 0, found = 0;
+      // get card from hand
+      while (true)
       {
-        // choice first
-        int pos = 0, found = 0;
-        // get card from hand
-        while (true)
+        user_card = user_cards[pos];
+        if (user_card.available)
         {
-          user_card = user_cards[pos];
-          if (user_card.available)
-          {
-            found++;
-          }
-
-          if (found == user_action.choice)
-          {
-            user_cards[pos].available = false;
-            break;
-          }
-
-          pos++;
+          found++;
         }
 
+        if (found == user_action.choice)
+        {
+          user_cards[pos].available = false;
+          break;
+        }
+
+        pos++;
+      }
+
+      if (user_action.hid_card)
+      {
         // hide after
         user_card.rank = facedown;
         user_card.suit = facedown;
         user_card.value = facedown;
-      }
-      else
-      {
-        // choice first
-        int pos = 0, found = 0;
-        // get card from hand
-        while (true)
-        {
-          user_card = user_cards[pos];
-          if (user_card.available)
-          {
-            found++;
-          }
-
-          if (found == user_action.choice)
-          {
-            user_cards[pos].available = false;
-            break;
-          }
-
-          pos++;
-        }
-      }
-
-      if (user_action.asked_truco && !user_action.asked_truco_first)
-      {
-        // ask truco
       }
 
       state = get_state().previous_state == ASK_CPU_CARD ? IDLE : ASK_CPU_CARD;

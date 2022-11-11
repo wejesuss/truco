@@ -4,7 +4,6 @@ typedef struct player_action
 {
   int choice;
   bool asked_truco;
-  bool asked_truco_first;
   bool hid_card;
 } player_action;
 

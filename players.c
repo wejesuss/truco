@@ -58,7 +58,6 @@ player_action get_choice(int available)
   player_action action = {
       .choice = 0,
       .asked_truco = false,
-      .asked_truco_first = false,
       .hid_card = false};
 
   char c;
@@ -69,19 +68,13 @@ player_action get_choice(int available)
       break;
     }
 
-    if (c == 't' && !is_hand_of_ten() && !action.asked_truco)
+    if (c == 't' && !is_hand_of_ten())
     {
       action.asked_truco = true;
-
-      if (!action.hid_card && action.choice == 0)
-      {
-        action.asked_truco_first = true;
-      }
-
       continue;
     }
 
-    if (c == '?' && available != 3 && !is_hand_of_ten() && !action.hid_card)
+    if (c == '?' && available != 3 && !is_hand_of_ten())
     {
       action.hid_card = true;
       continue;
@@ -106,7 +99,6 @@ player_action get_user_action(card *user_cards)
   player_action action = {
       .choice = 0,
       .asked_truco = false,
-      .asked_truco_first = false,
       .hid_card = false};
 
   while (action.choice < 1 || action.choice > available)
