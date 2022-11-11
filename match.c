@@ -1,6 +1,9 @@
 #include "./players.h"
 #include "./state-manager.h"
 
+#define str(x) #x
+#define xstr(x) str(x)
+
 bool is_user_foot = true;
 
 enum round_result
@@ -97,23 +100,28 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
         {
           if (current_asking_player == USER_ASKING_TRUCO)
           {
+            printf("%s\n\n", xstr(USER_ASKING_TRUCO));
             option = ask_cpu_truco();
           }
           else
           {
+            printf("%s\n\n", xstr(CPU_ASKING_TRUCO));
             option = ask_user_truco();
           }
 
           if (option == deny)
           {
+            printf("%s\n\n", xstr(deny));
             if (current_asking_player == USER_ASKING_TRUCO)
             {
               // set user as winner
+              printf("%s\n\n", xstr(WIN));
               current_result = WIN;
             }
             else
             {
               // set cpu as winner
+              printf("%s\n\n", xstr(LOSE));
               current_result = LOSE;
             }
 
@@ -123,12 +131,15 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
           // accept or retruco
           raise_stake(&stake);
+          printf("aposta vale %i\n", stake);
 
           if (option != retruco)
           {
+            printf("%s\n\n", xstr(accept));
             break;
           }
 
+          printf("%s\n\n", xstr(retruco));
           enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO ? CPU_ASKING_TRUCO : USER_ASKING_TRUCO;
           set_asking_player(new_asking_player);
           previous_asking_player = get_previous_asking_player();
