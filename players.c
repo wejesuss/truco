@@ -156,29 +156,29 @@ enum truco_options ask_user_truco()
   printf(" deseja correr (n) aceitar (s) ou retrucar (t)?\n");
 
   enum truco_options option;
-  bool can_stop_getting_char = false;
+  bool valid_answer = false;
   char c;
-  while (!can_stop_getting_char)
+  while (!valid_answer)
   {
-    printf("O que quer fazer (n/s/t)? ");
+    printf("\nO que quer fazer (n/s/t)? ");
     c = getchar();
 
     if (c == 'n')
     {
       option = deny;
-      can_stop_getting_char = true;
+      valid_answer = true;
     }
 
     if (c == 's')
     {
       option = accept;
-      can_stop_getting_char = true;
+      valid_answer = true;
     }
 
     if (c == 't')
     {
       option = retruco;
-      can_stop_getting_char = true;
+      valid_answer = true;
     }
   }
 
