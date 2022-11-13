@@ -46,27 +46,28 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     draw_cards(cards, user_ptr, cpu_ptr);
   }
 
-  enum states state = get_state().current_state;
+  state match_state = get_state();
   trick tricks[3];
   int trick = 0;
   enum round_result current_result = TIE;
   bool is_user_turn = !is_user_foot;
   card user_card, cpu_card;
 
-  while (state != END_OF_MATCH)
+  while (match_state.current_state != END_OF_MATCH)
   {
-    switch (state)
+    switch (match_state.current_state)
     {
     case IDLE:
       printf("IDLE\n");
-      if (asked_two_players())
+      if (match_state.asked_two_players)
       {
         update_state(SET_TRICK_RESULT);
       }
       else
       {
-        state = (trick > 0) ? CHECK_USER_TURN : SET_ASK_PLAYER_CARD;
-        update_state(state);
+        update_state((trick > 0)
+                         ? CHECK_USER_TURN
+                         : SET_ASK_PLAYER_CARD);
       }
 
       break;
@@ -79,8 +80,9 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case SET_ASK_PLAYER_CARD:
       printf("SET_ASK_PLAYER_CARD\n");
-      state = (is_user_turn) ? ASK_USER_CARD : ASK_CPU_CARD;
-      update_state(state);
+      update_state((is_user_turn)
+                       ? ASK_USER_CARD
+                       : ASK_CPU_CARD);
       break;
 
     case ASK_USER_CARD:
@@ -92,9 +94,9 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       {
         enum truco_options option;
 
-        set_asking_player(USER_ASKING_TRUCO);
-        enum calltruco current_asking_player = get_current_asking_player();
-        enum calltruco previous_asking_player = get_previous_asking_player();
+        match_state = set_asking_player(USER_ASKING_TRUCO);
+        enum calltruco current_asking_player = match_state.current_asking_player;
+        enum calltruco previous_asking_player = match_state.previous_asking_player;
 
         while (current_asking_player != previous_asking_player)
         {
@@ -140,10 +142,12 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
           }
 
           printf("%s\n\n", xstr(retruco));
-          enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO ? CPU_ASKING_TRUCO : USER_ASKING_TRUCO;
-          set_asking_player(new_asking_player);
-          previous_asking_player = get_previous_asking_player();
-          current_asking_player = get_current_asking_player();
+          enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO
+                                                 ? CPU_ASKING_TRUCO
+                                                 : USER_ASKING_TRUCO;
+          match_state = set_asking_player(new_asking_player);
+          previous_asking_player = match_state.previous_asking_player;
+          current_asking_player = match_state.current_asking_player;
         }
 
         if (option == deny)
@@ -180,20 +184,24 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
         user_card.value = facedown;
       }
 
-      state = get_state().previous_state == ASK_CPU_CARD ? IDLE : ASK_CPU_CARD;
-      update_state(state);
+      update_state(match_state.previous_state == ASK_CPU_CARD
+                       ? IDLE
+                       : ASK_CPU_CARD);
       break;
 
     case ASK_CPU_CARD:
       printf("ASK_CPU_CARD\n");
       cpu_card = ask_cpu_for_card(cpu_cards);
-      state = get_state().previous_state == ASK_USER_CARD ? IDLE : ASK_USER_CARD;
-      update_state(state);
+      update_state(match_state.previous_state == ASK_USER_CARD
+                       ? IDLE
+                       : ASK_USER_CARD);
       break;
 
     case SET_TRICK_RESULT:
       printf("SET_TRICK_RESULT\n");
-      set_trick_result(is_user_turn, user_card, cpu_card, &tricks[trick]);
+      set_trick_result(is_user_turn,
+                       user_card, cpu_card,
+                       &tricks[trick]);
       update_state(SHOW_PLAYED_CARDS);
       break;
 
@@ -224,29 +232,28 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       printf("UPDATE_WINNER_TENTOS\n");
       // deciding who has won (if so), updating the score
 
-      state = IDLE;
+      enum states next_state = IDLE;
       // user wins
       if (current_result == WIN)
       {
         (*user_tentos) += stake;
-        state = END_OF_MATCH;
+        next_state = END_OF_MATCH;
       }
       // cpu wins
       else if (current_result == LOSE)
       {
         (*cpu_tentos) += stake;
-        state = END_OF_MATCH;
+        next_state = END_OF_MATCH;
       }
       // it's a tie; tie-tie-tie
       else if (trick == 2)
       {
-        state = END_OF_MATCH;
+        next_state = END_OF_MATCH;
       }
 
       // game continues if no one has won
       // on the second trick
-
-      update_state(state);
+      update_state(next_state);
       trick++;
       break;
 
@@ -256,7 +263,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       break;
     }
 
-    state = get_state().current_state;
+    match_state = get_state();
   }
 
   reset_state();

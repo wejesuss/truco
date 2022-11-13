@@ -34,8 +34,5 @@ typedef struct state
 state get_state();
 state update_state(enum states new_state);
 state reset_state();
-void set_asked_two_players(enum states new_state);
-bool asked_two_players();
-enum calltruco get_current_asking_player();
-enum calltruco get_previous_asking_player();
-void set_asking_player(enum calltruco new_asking_player);
+state set_asked_two_players(enum states new_state);
+state set_asking_player(enum calltruco new_asking_player);
