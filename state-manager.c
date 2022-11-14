@@ -10,6 +10,7 @@
 static state match_state = {
     .current_state = IDLE,
     .previous_state = IDLE,
+    .next_state = IDLE,
     .current_asking_player = NO_PLAYER_ASKING_TRUCO,
     .previous_asking_player = NO_PLAYER_ASKING_TRUCO,
     .asked_two_players = false};

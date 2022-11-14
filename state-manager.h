@@ -23,6 +23,7 @@ typedef struct state
 {
   enum states current_state;
   enum states previous_state;
+  enum states next_state;
   // which player is asking truco
   enum calltruco current_asking_player;
   // which player has asked truco

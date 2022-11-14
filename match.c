@@ -25,18 +25,18 @@ void set_trick_result(bool is_user_turn, card user_card, card cpu_card,
                       trick *first_trick);
 enum round_result check_winner(trick *tricks, bool check_third_trick);
 
-void idle(state match_state, int trick)
+state idle(state match_state, int trick)
 {
   if (match_state.asked_two_players)
   {
-    update_state(SET_TRICK_RESULT);
+    match_state.next_state = SET_TRICK_RESULT;
   }
   else
   {
-    update_state((trick > 0)
-                     ? CHECK_USER_TURN
-                     : SET_ASK_PLAYER_CARD);
+    match_state.next_state = (trick > 0) ? CHECK_USER_TURN : SET_ASK_PLAYER_CARD;
   }
+
+  return match_state;
 }
 
 state ask_user_card(state match_state,
@@ -84,7 +84,8 @@ state ask_user_card(state match_state,
           *current_result = LOSE;
         }
 
-        update_state(UPDATE_WINNER_TENTOS);
+        // will be set when we're out
+        match_state.next_state = UPDATE_WINNER_TENTOS;
         break;
       }
 
@@ -141,30 +142,35 @@ state ask_user_card(state match_state,
     (*user_card).value = facedown;
   }
 
-  update_state(match_state.previous_state == ASK_CPU_CARD
-                   ? IDLE
-                   : ASK_CPU_CARD);
+  // will be set when we're out
+  match_state.next_state = match_state.previous_state == ASK_CPU_CARD
+                               ? IDLE
+                               : ASK_CPU_CARD;
 
   return match_state;
 }
 
-void check_match_winner(trick *tricks, int *trick, enum round_result *current_result)
+enum states check_match_winner(trick *tricks, int *trick, enum round_result *current_result)
 {
   // if it's second or third round
   if ((*trick) >= 1)
   {
     (*current_result) = check_winner(tricks, (*trick) < 2 ? false : true);
-    update_state(UPDATE_WINNER_TENTOS);
+    return UPDATE_WINNER_TENTOS;
   }
   // we don't have a winner with just one round
   else
   {
-    update_state(IDLE);
     (*trick)++;
+    return IDLE;
   }
 }
 
-void update_winner_tentos(int *user_tentos, int *cpu_tentos, int trick, enum round_result current_result, int stake)
+enum states update_winner_tentos(int *user_tentos,
+                                 int *cpu_tentos,
+                                 int trick,
+                                 enum round_result current_result,
+                                 int stake)
 {
   // deciding who has won (if so), updating the score
   enum states next_state = IDLE;
@@ -188,7 +194,7 @@ void update_winner_tentos(int *user_tentos, int *cpu_tentos, int trick, enum rou
 
   // game continues if no one has won
   // on the second trick
-  update_state(next_state);
+  return next_state;
 }
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
@@ -225,8 +231,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     {
     case IDLE:
       printf("IDLE\n");
-      idle(match_state, trick);
-
+      match_state = idle(match_state, trick);
+      update_state(match_state.next_state);
       break;
 
     case CHECK_USER_TURN:
@@ -237,19 +243,18 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case SET_ASK_PLAYER_CARD:
       printf("SET_ASK_PLAYER_CARD\n");
-      update_state((is_user_turn)
-                       ? ASK_USER_CARD
-                       : ASK_CPU_CARD);
+      update_state((is_user_turn) ? ASK_USER_CARD : ASK_CPU_CARD);
       break;
 
     case ASK_USER_CARD:
       printf("ASK_USER_CARD\n");
-
       match_state = ask_user_card(match_state,
                                   user_cards,
                                   &user_card,
                                   &current_result,
                                   &stake);
+
+      update_state(match_state.next_state);
       break;
 
     case ASK_CPU_CARD:
@@ -276,16 +281,17 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case CHECK_WINNER:
       printf("CHECK_WINNER\n");
-      check_match_winner(tricks, &trick, &current_result);
-
+      match_state.next_state = check_match_winner(tricks, &trick, &current_result);
+      update_state(match_state.next_state);
       break;
 
     case UPDATE_WINNER_TENTOS:
       printf("UPDATE_WINNER_TENTOS\n");
-      update_winner_tentos(user_tentos, cpu_tentos,
-                           trick,
-                           current_result,
-                           stake);
+      match_state.next_state = update_winner_tentos(user_tentos, cpu_tentos,
+                                                    trick,
+                                                    current_result,
+                                                    stake);
+      update_state(match_state.next_state);
       trick++;
       break;
 
