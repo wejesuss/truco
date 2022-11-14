@@ -54,6 +54,7 @@ card ask_cpu_for_card(card *cpu_cards)
 player_action get_choice(int available)
 {
   show_instruction(available);
+  fflush(stdout);
 
   player_action action = {
       .choice = 0,
@@ -161,6 +162,7 @@ enum truco_options ask_user_truco()
   while (!valid_answer)
   {
     printf("\nO que quer fazer (n/s/t)? ");
+    fflush(stdout);
     c = getchar();
 
     if (c == 'n')

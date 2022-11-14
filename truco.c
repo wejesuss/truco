@@ -21,6 +21,7 @@ int main(void)
   }
 
   show_final_victor((*user.player_tentos), (*cpu.player_tentos));
+  fflush(stdout);
 
   return 0;
 }
