@@ -2,7 +2,7 @@
 
 ## Before playing
 
-You you're using windows, you should execute the following to allow support for the card symbols. This will mantain compatibility between program set of symbols and your console (and keep the game playable).
+If you're using windows, you should execute the following to allow support for the card symbols. This will mantain compatibility between program set of symbols and your console (and keep the game playable).
 
 ```cmd
 chcp 65001
