@@ -39,6 +39,69 @@ state idle(state match_state, int trick)
   return match_state;
 }
 
+enum truco_options asked_truco(state *match_state, enum round_result *current_result, int *stake)
+{
+  enum truco_options option;
+  (*match_state) = set_asking_player(USER_ASKING_TRUCO);
+  enum calltruco current_asking_player = (*match_state).current_asking_player;
+  enum calltruco previous_asking_player = (*match_state).previous_asking_player;
+
+  while (current_asking_player != previous_asking_player)
+  {
+    if (current_asking_player == USER_ASKING_TRUCO)
+    {
+      printf("%s\n\n", xstr(USER_ASKING_TRUCO));
+      option = ask_cpu_truco();
+    }
+    else
+    {
+      printf("%s\n\n", xstr(CPU_ASKING_TRUCO));
+      option = ask_user_truco();
+    }
+
+    if (option == deny)
+    {
+      printf("%s\n\n", xstr(deny));
+      if (current_asking_player == USER_ASKING_TRUCO)
+      {
+        // set user as winner
+        printf("%s\n\n", xstr(WIN));
+        *current_result = WIN;
+      }
+      else
+      {
+        // set cpu as winner
+        printf("%s\n\n", xstr(LOSE));
+        *current_result = LOSE;
+      }
+
+      // will be set when we're out
+      (*match_state).next_state = UPDATE_WINNER_TENTOS;
+      break;
+    }
+
+    // accept or retruco
+    raise_stake(stake);
+    printf("aposta vale %i\n", *stake);
+
+    if (option != retruco)
+    {
+      printf("%s\n\n", xstr(accept));
+      return option;
+    }
+
+    printf("%s\n\n", xstr(retruco));
+    enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO
+                                           ? CPU_ASKING_TRUCO
+                                           : USER_ASKING_TRUCO;
+    (*match_state) = set_asking_player(new_asking_player);
+    previous_asking_player = (*match_state).previous_asking_player;
+    current_asking_player = (*match_state).current_asking_player;
+  }
+
+  return option;
+}
+
 state ask_user_card(state match_state,
                     card *user_cards,
                     card *user_card,
@@ -49,65 +112,7 @@ state ask_user_card(state match_state,
 
   if (user_action.asked_truco)
   {
-    enum truco_options option;
-
-    match_state = set_asking_player(USER_ASKING_TRUCO);
-    enum calltruco current_asking_player = match_state.current_asking_player;
-    enum calltruco previous_asking_player = match_state.previous_asking_player;
-
-    while (current_asking_player != previous_asking_player)
-    {
-      if (current_asking_player == USER_ASKING_TRUCO)
-      {
-        printf("%s\n\n", xstr(USER_ASKING_TRUCO));
-        option = ask_cpu_truco();
-      }
-      else
-      {
-        printf("%s\n\n", xstr(CPU_ASKING_TRUCO));
-        option = ask_user_truco();
-      }
-
-      if (option == deny)
-      {
-        printf("%s\n\n", xstr(deny));
-        if (current_asking_player == USER_ASKING_TRUCO)
-        {
-          // set user as winner
-          printf("%s\n\n", xstr(WIN));
-          *current_result = WIN;
-        }
-        else
-        {
-          // set cpu as winner
-          printf("%s\n\n", xstr(LOSE));
-          *current_result = LOSE;
-        }
-
-        // will be set when we're out
-        match_state.next_state = UPDATE_WINNER_TENTOS;
-        break;
-      }
-
-      // accept or retruco
-      raise_stake(stake);
-      printf("aposta vale %i\n", *stake);
-
-      if (option != retruco)
-      {
-        printf("%s\n\n", xstr(accept));
-        break;
-      }
-
-      printf("%s\n\n", xstr(retruco));
-      enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO
-                                             ? CPU_ASKING_TRUCO
-                                             : USER_ASKING_TRUCO;
-      match_state = set_asking_player(new_asking_player);
-      previous_asking_player = match_state.previous_asking_player;
-      current_asking_player = match_state.current_asking_player;
-    }
-
+    enum truco_options option = asked_truco(&match_state, current_result, stake);
     if (option == deny)
     {
       return match_state;
@@ -115,31 +120,12 @@ state ask_user_card(state match_state,
   }
 
   // choice first
-  int pos = 0, found = 0;
-  // get card from hand
-  while (true)
-  {
-    *user_card = user_cards[pos];
-    if ((*user_card).available)
-    {
-      found++;
-    }
-
-    if (found == user_action.choice)
-    {
-      user_cards[pos].available = false;
-      break;
-    }
-
-    pos++;
-  }
+  (*user_card) = get_card_from_hand(user_cards, user_action.choice);
 
   if (user_action.hid_card)
   {
     // hide after
-    (*user_card).rank = facedown;
-    (*user_card).suit = facedown;
-    (*user_card).value = facedown;
+    hide_card(user_card);
   }
 
   // will be set when we're out
