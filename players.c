@@ -58,7 +58,6 @@ player_action get_choice(int available)
   player_action action = {
       .choice = 0,
       .asked_truco = false,
-      .asked_truco_first = false,
       .hid_card = false};
 
   char c;
@@ -69,19 +68,13 @@ player_action get_choice(int available)
       break;
     }
 
-    if (c == 't' && !is_hand_of_ten() && !action.asked_truco)
+    if (c == 't' && !is_hand_of_ten())
     {
       action.asked_truco = true;
-
-      if (!action.hid_card && action.choice == 0)
-      {
-        action.asked_truco_first = true;
-      }
-
       continue;
     }
 
-    if (c == '?' && available != 3 && !is_hand_of_ten() && !action.hid_card)
+    if (c == '?' && available != 3 && !is_hand_of_ten())
     {
       action.hid_card = true;
       continue;
@@ -106,7 +99,6 @@ player_action get_user_action(card *user_cards)
   player_action action = {
       .choice = 0,
       .asked_truco = false,
-      .asked_truco_first = false,
       .hid_card = false};
 
   while (action.choice < 1 || action.choice > available)
@@ -135,6 +127,65 @@ int show_player_cards(card *player_cards)
   printf("\n");
 
   return available;
+}
+
+enum truco_options ask_cpu_truco()
+{
+  // pick a random number
+  bool accepted = rand() % 2;
+  // use it to decide wheter or not truco was accepted
+  if (!accepted)
+  {
+    return deny;
+  }
+
+  // if accepted, pick another random number
+  bool ask_truco = rand() % 2;
+  // use it to decide if cpu will retruco
+  if (ask_truco)
+  {
+    return retruco;
+  }
+
+  return accept;
+}
+
+enum truco_options ask_user_truco()
+{
+  printf("CPU está chamando truco");
+  printf(" deseja correr (n) aceitar (s) ou retrucar (t)?\n");
+
+  enum truco_options option;
+  bool valid_answer = false;
+  char c;
+  while (!valid_answer)
+  {
+    printf("\nO que quer fazer (n/s/t)? ");
+    c = getchar();
+
+    if (c == 'n')
+    {
+      option = deny;
+      valid_answer = true;
+    }
+
+    if (c == 's')
+    {
+      option = accept;
+      valid_answer = true;
+    }
+
+    if (c == 't')
+    {
+      option = retruco;
+      valid_answer = true;
+    }
+  }
+
+  while ((c = getchar()) != EOF && c != '\n')
+    ;
+
+  return option;
 }
 
 void show_instruction(int available)

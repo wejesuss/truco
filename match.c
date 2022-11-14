@@ -1,6 +1,9 @@
 #include "./players.h"
 #include "./state-manager.h"
 
+#define str(x) #x
+#define xstr(x) str(x)
+
 bool is_user_foot = true;
 
 enum round_result
@@ -16,10 +19,169 @@ typedef struct trick
   bool is_tied_by_user;
 } trick;
 
+void raise_stake(int *current_stake);
 bool check_user_turn(trick trick);
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,
                       trick *first_trick);
 enum round_result check_winner(trick *tricks, bool check_third_trick);
+
+state idle(state match_state, int trick)
+{
+  if (match_state.asked_two_players)
+  {
+    match_state.next_state = SET_TRICK_RESULT;
+  }
+  else
+  {
+    match_state.next_state = (trick > 0) ? CHECK_USER_TURN : SET_ASK_PLAYER_CARD;
+  }
+
+  return match_state;
+}
+
+enum truco_options asked_truco(state *match_state, enum round_result *current_result, int *stake)
+{
+  enum truco_options option;
+  (*match_state) = set_asking_player(USER_ASKING_TRUCO);
+  enum calltruco current_asking_player = (*match_state).current_asking_player;
+  enum calltruco previous_asking_player = (*match_state).previous_asking_player;
+
+  while (current_asking_player != previous_asking_player)
+  {
+    if (current_asking_player == USER_ASKING_TRUCO)
+    {
+      printf("%s\n\n", xstr(USER_ASKING_TRUCO));
+      option = ask_cpu_truco();
+    }
+    else
+    {
+      printf("%s\n\n", xstr(CPU_ASKING_TRUCO));
+      option = ask_user_truco();
+    }
+
+    if (option == deny)
+    {
+      printf("%s\n\n", xstr(deny));
+      if (current_asking_player == USER_ASKING_TRUCO)
+      {
+        // set user as winner
+        printf("%s\n\n", xstr(WIN));
+        *current_result = WIN;
+      }
+      else
+      {
+        // set cpu as winner
+        printf("%s\n\n", xstr(LOSE));
+        *current_result = LOSE;
+      }
+
+      // will be set when we're out
+      (*match_state).next_state = UPDATE_WINNER_TENTOS;
+      break;
+    }
+
+    // accept or retruco
+    raise_stake(stake);
+    printf("aposta vale %i\n", *stake);
+
+    if (option != retruco)
+    {
+      printf("%s\n\n", xstr(accept));
+      return option;
+    }
+
+    printf("%s\n\n", xstr(retruco));
+    enum calltruco new_asking_player = current_asking_player == USER_ASKING_TRUCO
+                                           ? CPU_ASKING_TRUCO
+                                           : USER_ASKING_TRUCO;
+    (*match_state) = set_asking_player(new_asking_player);
+    previous_asking_player = (*match_state).previous_asking_player;
+    current_asking_player = (*match_state).current_asking_player;
+  }
+
+  return option;
+}
+
+state ask_user_card(state match_state,
+                    card *user_cards,
+                    card *user_card,
+                    enum round_result *current_result,
+                    int *stake)
+{
+  player_action user_action = get_user_action(user_cards);
+
+  if (user_action.asked_truco)
+  {
+    enum truco_options option = asked_truco(&match_state, current_result, stake);
+    if (option == deny)
+    {
+      return match_state;
+    }
+  }
+
+  // choice first
+  (*user_card) = get_card_from_hand(user_cards, user_action.choice);
+
+  if (user_action.hid_card)
+  {
+    // hide after
+    hide_card(user_card);
+  }
+
+  // will be set when we're out
+  match_state.next_state = match_state.previous_state == ASK_CPU_CARD
+                               ? IDLE
+                               : ASK_CPU_CARD;
+
+  return match_state;
+}
+
+enum states check_match_winner(trick *tricks, int *trick, enum round_result *current_result)
+{
+  // if it's second or third round
+  if ((*trick) >= 1)
+  {
+    (*current_result) = check_winner(tricks, (*trick) < 2 ? false : true);
+    return UPDATE_WINNER_TENTOS;
+  }
+  // we don't have a winner with just one round
+  else
+  {
+    (*trick)++;
+    return IDLE;
+  }
+}
+
+enum states update_winner_tentos(int *user_tentos,
+                                 int *cpu_tentos,
+                                 int trick,
+                                 enum round_result current_result,
+                                 int stake)
+{
+  // deciding who has won (if so), updating the score
+  enum states next_state = IDLE;
+  // user wins
+  if (current_result == WIN)
+  {
+    (*user_tentos) += stake;
+    next_state = END_OF_MATCH;
+  }
+  // cpu wins
+  else if (current_result == LOSE)
+  {
+    (*cpu_tentos) += stake;
+    next_state = END_OF_MATCH;
+  }
+  // it's a tie; tie-tie-tie
+  else if (trick == 2)
+  {
+    next_state = END_OF_MATCH;
+  }
+
+  // game continues if no one has won
+  // on the second trick
+  return next_state;
+}
 
 void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 {
@@ -28,6 +190,8 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
   int *cpu_tentos = (*cpu_ptr).player_tentos;
   card *cpu_cards = (*cpu_ptr).cards;
+
+  int stake = 2;
 
   // cards array should be pushed here for each player (randomly for the first card)
   shuffle_cards(cards);
@@ -40,29 +204,21 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
     draw_cards(cards, user_ptr, cpu_ptr);
   }
 
-  enum states state = get_state().current_state;
+  state match_state = get_state();
   trick tricks[3];
   int trick = 0;
   enum round_result current_result = TIE;
   bool is_user_turn = !is_user_foot;
   card user_card, cpu_card;
 
-  while (state != END_OF_MATCH)
+  while (match_state.current_state != END_OF_MATCH)
   {
-    switch (state)
+    switch (match_state.current_state)
     {
     case IDLE:
       printf("IDLE\n");
-      if (asked_two_players())
-      {
-        update_state(SET_TRICK_RESULT);
-      }
-      else
-      {
-        state = (trick > 0) ? CHECK_USER_TURN : SET_ASK_PLAYER_CARD;
-        update_state(state);
-      }
-
+      match_state = idle(match_state, trick);
+      update_state(match_state.next_state);
       break;
 
     case CHECK_USER_TURN:
@@ -73,88 +229,33 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case SET_ASK_PLAYER_CARD:
       printf("SET_ASK_PLAYER_CARD\n");
-      state = (is_user_turn) ? ASK_USER_CARD : ASK_CPU_CARD;
-      update_state(state);
+      update_state((is_user_turn) ? ASK_USER_CARD : ASK_CPU_CARD);
       break;
 
     case ASK_USER_CARD:
       printf("ASK_USER_CARD\n");
+      match_state = ask_user_card(match_state,
+                                  user_cards,
+                                  &user_card,
+                                  &current_result,
+                                  &stake);
 
-      player_action user_action = get_user_action(user_cards);
-      if (user_action.asked_truco_first)
-      {
-        // ask truco
-      }
-
-      if (user_action.hid_card)
-      {
-        // choice first
-        int pos = 0, found = 0;
-        // get card from hand
-        while (true)
-        {
-          user_card = user_cards[pos];
-          if (user_card.available)
-          {
-            found++;
-          }
-
-          if (found == user_action.choice)
-          {
-            user_cards[pos].available = false;
-            break;
-          }
-
-          pos++;
-        }
-
-        // hide after
-        user_card.rank = facedown;
-        user_card.suit = facedown;
-        user_card.value = facedown;
-      }
-      else
-      {
-        // choice first
-        int pos = 0, found = 0;
-        // get card from hand
-        while (true)
-        {
-          user_card = user_cards[pos];
-          if (user_card.available)
-          {
-            found++;
-          }
-
-          if (found == user_action.choice)
-          {
-            user_cards[pos].available = false;
-            break;
-          }
-
-          pos++;
-        }
-      }
-
-      if (user_action.asked_truco && !user_action.asked_truco_first)
-      {
-        // ask truco
-      }
-
-      state = get_state().previous_state == ASK_CPU_CARD ? IDLE : ASK_CPU_CARD;
-      update_state(state);
+      update_state(match_state.next_state);
       break;
 
     case ASK_CPU_CARD:
       printf("ASK_CPU_CARD\n");
       cpu_card = ask_cpu_for_card(cpu_cards);
-      state = get_state().previous_state == ASK_USER_CARD ? IDLE : ASK_USER_CARD;
-      update_state(state);
+      update_state(match_state.previous_state == ASK_USER_CARD
+                       ? IDLE
+                       : ASK_USER_CARD);
       break;
 
     case SET_TRICK_RESULT:
       printf("SET_TRICK_RESULT\n");
-      set_trick_result(is_user_turn, user_card, cpu_card, &tricks[trick]);
+      set_trick_result(is_user_turn,
+                       user_card, cpu_card,
+                       &tricks[trick]);
       update_state(SHOW_PLAYED_CARDS);
       break;
 
@@ -166,48 +267,17 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
 
     case CHECK_WINNER:
       printf("CHECK_WINNER\n");
-      // if it's second or third round
-      if (trick >= 1)
-      {
-        current_result = check_winner(tricks, trick < 2 ? false : true);
-        update_state(UPDATE_WINNER_TENTOS);
-      }
-      // we don't have a winner with just one round
-      else
-      {
-        update_state(IDLE);
-        trick++;
-      }
-
+      match_state.next_state = check_match_winner(tricks, &trick, &current_result);
+      update_state(match_state.next_state);
       break;
 
     case UPDATE_WINNER_TENTOS:
       printf("UPDATE_WINNER_TENTOS\n");
-      // deciding who has won (if so), updating the score
-
-      state = IDLE;
-      // user wins
-      if (current_result == WIN)
-      {
-        (*user_tentos) += 2;
-        state = END_OF_MATCH;
-      }
-      // cpu wins
-      else if (current_result == LOSE)
-      {
-        (*cpu_tentos) += 2;
-        state = END_OF_MATCH;
-      }
-      // it's a tie; tie-tie-tie
-      else if (trick == 2)
-      {
-        state = END_OF_MATCH;
-      }
-
-      // game continues if no one has won
-      // on the second trick
-
-      update_state(state);
+      match_state.next_state = update_winner_tentos(user_tentos, cpu_tentos,
+                                                    trick,
+                                                    current_result,
+                                                    stake);
+      update_state(match_state.next_state);
       trick++;
       break;
 
@@ -217,7 +287,7 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
       break;
     }
 
-    state = get_state().current_state;
+    match_state = get_state();
   }
 
   reset_state();
@@ -226,6 +296,23 @@ void play_hand(card *cards, player *user_ptr, player *cpu_ptr)
   reset_deck(cards);
   // toggling who will shuffle the cards next
   is_user_foot = !is_user_foot;
+}
+
+void raise_stake(int *current_stake)
+{
+  if (*current_stake < 12)
+  {
+    switch (*current_stake)
+    {
+    case 4:
+      *current_stake += 4;
+      break;
+
+    default:
+      *current_stake += 2;
+      break;
+    }
+  }
 }
 
 void set_trick_result(bool is_user_turn, card user_card, card cpu_card,

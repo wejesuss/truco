@@ -12,15 +12,28 @@ enum states
   UPDATE_WINNER_TENTOS
 };
 
+enum calltruco
+{
+  NO_PLAYER_ASKING_TRUCO,
+  USER_ASKING_TRUCO,
+  CPU_ASKING_TRUCO
+};
+
 typedef struct state
 {
   enum states current_state;
   enum states previous_state;
+  enum states next_state;
+  // which player is asking truco
+  enum calltruco current_asking_player;
+  // which player has asked truco
+  enum calltruco previous_asking_player;
+  // if the two playes were asked a card
   bool asked_two_players;
 } state;
 
 state get_state();
 state update_state(enum states new_state);
 state reset_state();
-void set_asked_two_players(enum states new_state);
-bool asked_two_players();
+state set_asked_two_players(enum states new_state);
+state set_asking_player(enum calltruco new_asking_player);
