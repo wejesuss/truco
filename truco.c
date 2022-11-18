@@ -15,7 +15,7 @@ int main(void)
   player user = get_user(), cpu = get_cpu();
   reset_players();
 
-  while ((*user.player_tentos) < 12 && *cpu.player_tentos < 12)
+  while ((*user.player_tentos) < 12 && (*cpu.player_tentos) < 12)
   {
     play_hand(cards, &user, &cpu);
   }
