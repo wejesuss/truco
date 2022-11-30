@@ -205,10 +205,10 @@ enum truco_options ask_user_truco()
       option = retruco;
       valid_answer = true;
     }
-  }
 
-  while ((c = getchar()) != EOF && c != '\n')
-    ;
+    while ((c = getchar()) != EOF && c != '\n')
+      ;
+  }
 
   return option;
 }
