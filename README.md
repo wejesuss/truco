@@ -14,5 +14,6 @@ This is a temporary change, don't worry. This will change you set of characters 
 
 - [x] Show friendly messages for both the entire game and each match
 - [x] Redesign control flow to support other functionalities
-- [ ] Add other truco functionalities (e.g. ask for truco, hide card)
+- [x] Add other truco functionalities (e.g. ask for truco, hide card)
+- [ ] Fix other minor bugs
 - [ ] Create CPU "AI" (something better than random decision)
