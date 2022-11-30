@@ -31,24 +31,46 @@ bool is_hand_of_ten()
   return false;
 }
 
-card ask_cpu_for_card(card *cpu_cards)
+bool percentage_random(int percentage)
+{
+  int range = (rand() % 100) + 1;
+  printf("range: %i | percentage: %i\n", range, percentage);
+  int inclusion_limit = percentage;
+
+  if (range <= inclusion_limit)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+player_action get_cpu_action(card *cpu_cards)
 {
   printf("Cartas do CPU são: ");
-  show_player_cards(cpu_cards);
+  int available = show_player_cards(cpu_cards);
   printf("\n");
 
-  int index = rand() % TOTAL_HAND_CARDS_NUMBER;
-  card card = cpu_cards[index];
+  player_action cpu_action = {
+      .asked_truco = false,
+      .choice = 0,
+      .hid_card = false};
 
-  while (!card.available)
+  cpu_action.choice = (rand() % available) + 1;
+  if (!is_hand_of_ten())
   {
-    index = rand() % TOTAL_HAND_CARDS_NUMBER;
-    card = cpu_cards[index];
+    // randomize if cpu will ask truco - 40% chance to ask truco
+    cpu_action.asked_truco = percentage_random(40);
+    if (available != 3)
+    {
+      //  randomize if cpu will hide card - 15% chance to hide card
+      cpu_action.hid_card = percentage_random(15);
+    }
   }
 
-  cpu_cards[index].available = false;
-
-  return card;
+  return cpu_action;
 }
 
 player_action get_choice(int available)
@@ -132,16 +154,17 @@ int show_player_cards(card *player_cards)
 
 enum truco_options ask_cpu_truco()
 {
-  // pick a random number
-  bool accepted = rand() % 2;
-  // use it to decide wheter or not truco was accepted
+  // pick a random number - 75% chance to accept truco
+  bool accepted = percentage_random(60);
+
+  // use it to decide whether or not truco was accepted
   if (!accepted)
   {
     return deny;
   }
 
-  // if accepted, pick another random number
-  bool ask_truco = rand() % 2;
+  // if accepted, pick another random number - 30% chance to retruco
+  bool ask_truco = percentage_random(30);
   // use it to decide if cpu will retruco
   if (ask_truco)
   {
@@ -192,10 +215,14 @@ enum truco_options ask_user_truco()
 
 void show_instruction(int available)
 {
-  printf("\nPeça truco com 't'");
-  if (available != 3 && !is_hand_of_ten())
+  if (!is_hand_of_ten())
   {
-    printf(" esconda uma carta com '?'");
+    printf("\nPeça truco com 't'");
+
+    if (available != 3)
+    {
+      printf(" esconda uma carta com '?'");
+    }
   }
 
   if (available > 1)

@@ -57,11 +57,11 @@ typedef struct player
 */
 
 card create_card(bool available, enum rank rank, enum suits suit, int value);
-card get_card_from_hand(card *user_cards, int choice);
+card get_card_from_hand(card *player_cards, int choice);
 void set_deck(card *cards);
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
 void shuffle_cards(card *cards);
-void hide_card(card *user_card);
+void hide_card(card *player_card);
 void play_hand(card *cards, player *user, player *cpu);
 void draw_cards(card *cards, player *player1_ptr, player *player2_ptr);
 void reset_deck(card *cards);
