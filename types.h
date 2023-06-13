@@ -29,7 +29,7 @@ enum rank
   three
 };
 
-enum trumpcards
+enum trumpcards // special cards
 {
   facedown = 0,
   fourclubs = 14,

@@ -143,7 +143,7 @@ card get_card_from_hand(card *player_cards, int choice)
 {
   card player_card;
   int pos = 0, found = 0;
-  // get card from hand
+  // get found card from choice'th position (choice 1 is first avalable found card)
   while (true)
   {
     player_card = player_cards[pos];
