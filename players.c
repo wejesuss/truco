@@ -154,7 +154,7 @@ int show_player_cards(card *player_cards)
 
 enum truco_options ask_cpu_truco()
 {
-  // pick a random number - 75% chance to accept truco
+  // pick a random number - 60% chance to accept truco
   bool accepted = percentage_random(60);
 
   // use it to decide whether or not truco was accepted
