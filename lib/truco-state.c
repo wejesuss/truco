@@ -1,6 +1,5 @@
+#include "./deck/cards.h"
 #include "./truco-state.h"
-
-card deck[40];
 
 void show_players_cards(playerHand *user_hand, playerHand *cpu_hand)
 {
@@ -75,8 +74,8 @@ void deal(trucoState *state)
   bool draw = (check_game_winner(state) == -1) ? true : false;
   if (draw)
   {
-    start_deck(deck);
-    draw_cards(deck, &state->playerHands[0], &state->playerHands[1]);
+    set_deck();
+    draw_cards(state->playerHands[0].cards, state->playerHands[1].cards);
   }
 }
 
@@ -132,7 +131,8 @@ trucoState clone_randomizing(trucoState *state, int player)
     }
   }
 
-  start_deck(deck);
+  set_deck();
+  card *deck = get_deck();
 
   for (int i = 0; i < 40; i++)
   {
