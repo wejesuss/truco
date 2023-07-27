@@ -149,20 +149,15 @@ trucoState clone_randomizing(trucoState *state, int player)
 
   for (int i = 0; i < 3; i++)
   {
-    card card = copy.playerHands[get_next_player(player) - 1].cards[i];
-    if (card.played)
+    card adversary_card = copy.playerHands[get_next_player(player) - 1].cards[i];
+    if (adversary_card.played)
     {
       continue;
     }
 
-    int pos = 0;
-    do
-    {
-      pos = rand() % 40;
-    } while (deck[pos].value == 0);
-
-    copy.playerHands[get_next_player(player) - 1].cards[i] = deck[pos];
-    deck[pos].value = 0;
+    int pos = rand() % TOTAL_CARDS_NUMBER;
+    card random_card = get_card(pos, TOTAL_CARDS_NUMBER);
+    copy.playerHands[get_next_player(player) - 1].cards[i] = random_card;
   }
 
   return copy;
