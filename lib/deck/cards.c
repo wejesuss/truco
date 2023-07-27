@@ -98,6 +98,14 @@ void draw_cards(card user_cards[3], card cpu_cards[3])
   cpu_cards[2] = get_card(start + 5, TOTAL_CARDS_NUMBER);
 }
 
+bool is_same_card(card reference, card move)
+{
+  bool same_value = reference.value == move.value;
+  bool same_look = reference.rank == move.rank && reference.suit == move.suit;
+
+  return (same_value && same_look);
+}
+
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank)
 {
   switch (rank)
