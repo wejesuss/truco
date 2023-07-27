@@ -75,6 +75,7 @@ void deal(trucoState *state)
   if (draw)
   {
     set_deck();
+    shuffle_cards();
     draw_cards(state->playerHands[0].cards, state->playerHands[1].cards);
   }
 }
@@ -132,6 +133,7 @@ trucoState clone_randomizing(trucoState *state, int player)
   }
 
   set_deck();
+  shuffle_cards();
   card *deck = get_deck();
 
   for (int i = 0; i < 40; i++)
