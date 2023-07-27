@@ -119,19 +119,24 @@ trucoState clone_randomizing(trucoState *state, int player)
 {
   trucoState copy = clone(state);
 
-  card *observer_cards = copy.playerHands[(player - 1)].cards;
+  int observer_player = player - 1;
+  int adversary_player = get_next_player(player) - 1;
+
+  card *observer_cards = copy.playerHands[observer_player].cards;
+  /// Forming what should be called an array of seen card from pov of observer player
   card seen_cards[6] = {observer_cards[0], observer_cards[1], observer_cards[2]};
   int seen_card_idx = 3;
 
   for (int i = 0; i < 3; i++)
   {
-    card card = copy.playerHands[get_next_player(player) - 1].cards[i];
+    card card = copy.playerHands[adversary_player].cards[i];
     if (card.played)
     {
       seen_cards[seen_card_idx++] = card;
     }
   }
 
+  // Forming a new deck to redistribute cards to adversary player
   set_deck();
   shuffle_cards();
   card *deck = get_deck();
@@ -149,17 +154,17 @@ trucoState clone_randomizing(trucoState *state, int player)
     }
   }
 
+  int pos = rand() % TOTAL_CARDS_NUMBER;
   for (int i = 0; i < 3; i++)
   {
-    card adversary_card = copy.playerHands[get_next_player(player) - 1].cards[i];
+    card adversary_card = copy.playerHands[adversary_player].cards[i];
     if (adversary_card.played)
     {
       continue;
     }
 
-    int pos = rand() % TOTAL_CARDS_NUMBER;
-    card random_card = get_card(pos, TOTAL_CARDS_NUMBER);
-    copy.playerHands[get_next_player(player) - 1].cards[i] = random_card;
+    card random_card = get_card(pos + i, TOTAL_CARDS_NUMBER);
+    copy.playerHands[adversary_player].cards[i] = random_card;
   }
 
   return copy;
