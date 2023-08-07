@@ -80,6 +80,7 @@ int check_game_winner(trucoState *state)
 /// @param state The state to be resetted
 void deal(trucoState *state)
 {
+  state->stake = 2;
   state->currentTrick = 0;
   resetHands(state->playerHands);
   resetTricks(state->tricks);
@@ -107,6 +108,7 @@ int get_next_player(int player)
 trucoState clone(trucoState *state)
 {
   trucoState copy;
+  copy.stake = state->stake;
   copy.currentTrick = state->currentTrick;
   copy.playerToMove = state->playerToMove;
   copy.playerTentos[0] = state->playerTentos[0];
@@ -364,7 +366,7 @@ void do_move(trucoState *state, card move)
       // if so, update tricksTaken
       if (player >= 0)
       {
-        state->playerTentos[player] += 2;
+        state->playerTentos[player] += state->stake;
         deal(state);
       }
       else if (third_trick)

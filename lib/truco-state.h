@@ -37,11 +37,12 @@ typedef struct trick
 
 typedef struct trucoState
 {
+  int stake;
   int playerToMove;
   playerHand playerHands[NUMBER_OF_PLAYERS]; // cards in player hands
+  int playerTentos[NUMBER_OF_PLAYERS];
   int currentTrick;
   trick tricks[MAX_NUMBER_OF_TRICKS];
-  int playerTentos[NUMBER_OF_PLAYERS];
 } trucoState;
 
 /// @brief struct designed to be a generic return value for a card list followed by a quantity value
