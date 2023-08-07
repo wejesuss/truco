@@ -50,12 +50,11 @@ typedef struct card
 
 // Deck
 void set_deck();
-void reset_deck();
 card *get_deck();
 void draw_cards(card *user_cards, card *cpu_cards);
-void hide_card(card *player_card);
+// void hide_card(card *player_card);
 card create_card(bool available, enum rank rank, enum suits suit, int value);
-card get_card_from_hand(card *player_cards, int choice);
+// card get_card_from_hand(card *player_cards, int choice);
 bool is_same_card(card reference, card move);
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
 card get_card(int index, int limit);

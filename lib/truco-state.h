@@ -17,45 +17,6 @@ enum trick_result
   LOSE
 };
 
-// enum suits
-// {
-//   spades = 1, // (♠)
-//   hearts,     // (♥)
-//   diamonds,   // (♦)
-//   clubs       // (♣)
-// };
-
-// enum rank
-// {
-//   four = 1,
-//   five,
-//   six,
-//   seven,
-//   queen,
-//   jack,
-//   king,
-//   ace,
-//   two,
-//   three
-// };
-
-// enum trumpcards // special cards
-// {
-//   facedown = 0,
-//   fourclubs = 14,
-//   sevenhearts = 13,
-//   acespades = 12,
-//   sevendiamonds = 11
-// };
-
-// typedef struct card
-// {
-//   enum rank rank;
-//   enum suits suit;
-//   int value;
-//   bool played;
-// } card;
-
 typedef struct playerHand
 {
   card cards[TOTAL_HAND_CARDS_NUMBER];
@@ -83,7 +44,7 @@ typedef struct trucoState
   int playerTentos[NUMBER_OF_PLAYERS];
 } trucoState;
 
-/// @brief struct designed to be a generic return value for a cards list followed by a quantity value
+/// @brief struct designed to be a generic return value for a card list followed by a quantity value
 typedef struct moves_available
 {
   // how many moves we have
@@ -102,18 +63,9 @@ trucoState clone_randomizing(trucoState *state, int player);
 void deal(trucoState *state);
 moves_available get_moves(trucoState *state, moves_available *moves);
 void do_move(trucoState *state, card move);
-int get_result(trucoState *state, int player);
+int get_result(int tentos);
 
-// // Deck
-// void set_deck(card *cards);
-// void reset_deck(card *cards);
-// void shuffle_cards(card *cards);
-// void draw_cards(card user_cards[3], card cpu_cards[3]);
-// void hide_card(card *player_card);
-// card create_card(bool available, enum rank rank, enum suits suit, int value);
-// card get_card_from_hand(card *player_cards, int choice);
-// bool is_same_card(card reference, card move);
-// char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
+// Deck
 
 // Match
 void play_hand(card *cards, trucoState *state);

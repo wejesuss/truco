@@ -44,6 +44,21 @@ void resetTricks(trick *tricks)
   }
 }
 
+/// @brief Get result comparing with maximum amount of tentos
+/// @param tentos Amount of tentos player has obtained
+/// @return Number representing how good a state is
+int get_result(int tentos)
+{
+  if (tentos >= MAX_PLAYER_TENTOS)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 /// @brief Check which player won the game
 /// @param state Game state to be checked
 /// @return Winning (1/2) player, minus one (-1) otherwise
@@ -51,8 +66,7 @@ int check_game_winner(trucoState *state)
 {
   for (int i = 0; i < NUMBER_OF_PLAYERS; i++)
   {
-    int tentos = state->playerTentos[i];
-    if (tentos >= MAX_PLAYER_TENTOS)
+    if (get_result(state->playerTentos[i]) == 1)
     {
       // winning player (non-zero indexed)
       return i + 1;
@@ -66,7 +80,6 @@ int check_game_winner(trucoState *state)
 /// @param state The state to be resetted
 void deal(trucoState *state)
 {
-
   state->currentTrick = 0;
   resetHands(state->playerHands);
   resetTricks(state->tricks);
@@ -114,7 +127,7 @@ trucoState clone(trucoState *state)
 /// randomizing any information not visible to the specified player
 /// @param state The state to be copied from
 /// @param player The observer player, pov to be used
-/// @return A new state with random cards unseen cards
+/// @return A new state with random unseen cards
 trucoState clone_randomizing(trucoState *state, int player)
 {
   trucoState copy = clone(state);
@@ -127,7 +140,7 @@ trucoState clone_randomizing(trucoState *state, int player)
   card seen_cards[6] = {observer_cards[0], observer_cards[1], observer_cards[2]};
   int seen_card_idx = 3;
 
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
     card card = copy.playerHands[adversary_player].cards[i];
     if (card.played)
@@ -141,7 +154,7 @@ trucoState clone_randomizing(trucoState *state, int player)
   shuffle_cards();
   card *deck = get_deck();
 
-  for (int i = 0; i < 40; i++)
+  for (int i = 0; i < TOTAL_CARDS_NUMBER; i++)
   {
     for (int j = 0; j < seen_card_idx; j++)
     {
@@ -149,13 +162,12 @@ trucoState clone_randomizing(trucoState *state, int player)
       if (is_same)
       {
         deck[i].played = true;
-        deck[i].value = 0;
       }
     }
   }
 
   int pos = rand() % TOTAL_CARDS_NUMBER;
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
     card adversary_card = copy.playerHands[adversary_player].cards[i];
     if (adversary_card.played)
@@ -171,8 +183,8 @@ trucoState clone_randomizing(trucoState *state, int player)
 }
 
 /// @brief Get all possible moves from the given state
-/// @param state Given state to analyse players hands
-/// @param cards Array of cards to be populated
+/// @param state Given state to pull player hand
+/// @param moves Array of moves to be populated
 moves_available get_moves(trucoState *state, moves_available *moves)
 {
   moves->quantity = 0;
@@ -361,22 +373,5 @@ void do_move(trucoState *state, card move)
         deal(state);
       }
     }
-  }
-}
-
-/// @brief Get result of a terminal state from the view point of player
-/// @param state Terminal state to analyse
-/// @param player player to use as POV
-/// @return Number representing how good a state is
-int get_result(trucoState *state, int player)
-{
-  int tentos = state->playerTentos[player];
-  if (tentos >= MAX_PLAYER_TENTOS)
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
   }
 }
