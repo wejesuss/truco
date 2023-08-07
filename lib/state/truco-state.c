@@ -1,4 +1,4 @@
-#include "./deck/cards.h"
+#include "../deck/cards.h"
 #include "./truco-state.h"
 
 void show_players_cards(playerHand *user_hand, playerHand *cpu_hand)
