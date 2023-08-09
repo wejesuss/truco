@@ -12,10 +12,10 @@ This is a temporary change, don't worry. This will change you set of characters 
 
 ## TODO
 
-- [x] Show friendly messages for both the entire game and each match
-- [x] Redesign control flow to support other functionalities
-- [x] Add other truco functionalities (e.g. ask for truco, hide card)
-- [ ] Create distinct and sharable interfaces for truco state and MCTS nodes
+- [X] Show friendly messages for both the entire game and each match
+- [X] Redesign control flow to support other functionalities
+- [X] Add other truco functionalities (e.g. ask for truco, hide card)
+- [X] Create distinct and sharable interfaces for truco state and MCTS nodes
 - [ ] Fix other minor bugs
 - [ ] Create CPU "AI" (something better than random decision)
 
