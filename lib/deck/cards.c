@@ -85,6 +85,38 @@ card get_card(int index, int limit)
   }
 }
 
+card get_card_from_hand(card *player_cards, int choice)
+{
+  card player_card;
+  int pos = 0, found = 0;
+  // get found card from choice'th position (choice 1 is first avalable found card)
+  while (true)
+  {
+    player_card = player_cards[pos];
+    if (!player_card.played)
+    {
+      found++;
+    }
+
+    if (found == choice)
+    {
+      player_cards[pos].played = true;
+      break;
+    }
+
+    pos++;
+  }
+
+  return player_card;
+}
+
+void hide_card(card *player_card)
+{
+  (*player_card).rank = facedown;
+  (*player_card).suit = facedown;
+  (*player_card).value = facedown;
+}
+
 void draw_cards(card user_cards[3], card cpu_cards[3])
 {
   int start = rand() % TOTAL_CARDS_NUMBER;

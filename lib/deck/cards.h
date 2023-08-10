@@ -58,6 +58,8 @@ card create_card(bool available, enum rank rank, enum suits suit, int value);
 bool is_same_card(card reference, card move);
 char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
 card get_card(int index, int limit);
+card get_card_from_hand(card *player_cards, int choice);
+void hide_card(card *player_card);
 // Shuffle algorithm by Ben Pfaff's Writings
 // see https://benpfaff.org/writings/clc/shuffle.html
 void shuffle_cards();

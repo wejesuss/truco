@@ -16,14 +16,6 @@ typedef struct node
   int player_just_moved;
 } node;
 
-/// @brief A list of Memory allocations
-typedef struct mem_alloc_list
-{
-  unsigned int quantity;
-  unsigned int position;
-  void **list;
-} alloc_list;
-
 node *add_child(node *parent, card move, int player);
 moves_available get_untried_moves(node *nd, moves_available *legal_moves, moves_available *untried_mvs);
 node *UCB_select_child(node *nd, float exploration);
