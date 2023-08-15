@@ -1,17 +1,6 @@
+#include "../types.h"
 #include "../deck/cards.h"
 #include "./truco-state.h"
-
-void show_players_cards(playerHand *user_hand, playerHand *cpu_hand)
-{
-  printf("\n\nPlayers cards\n");
-  for (int i = 0; i < 3; i++)
-  {
-    printf("%i %i - ", user_hand->cards[i].value, user_hand->cards[i].played);
-    printf("%i %i\n", cpu_hand->cards[i].value, cpu_hand->cards[i].played);
-  }
-
-  printf("\n");
-}
 
 void resetCards(card *cards)
 {

@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <stdbool.h>
 
 #define TOTAL_CARDS_NUMBER 40
 #define TOTAL_HAND_CARDS_NUMBER 3
@@ -63,3 +61,4 @@ void hide_card(card *player_card);
 // Shuffle algorithm by Ben Pfaff's Writings
 // see https://benpfaff.org/writings/clc/shuffle.html
 void shuffle_cards();
+void show_players_cards(card *user_hand, card *cpu_hand);

@@ -1,3 +1,4 @@
+#include "../types.h"
 #include "./malloc-list.h"
 
 /// @brief Create and return a new malloc list.

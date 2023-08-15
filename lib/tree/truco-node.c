@@ -1,3 +1,4 @@
+#include "../types.h"
 #include "../deck/cards.h"
 #include "../state/truco-state.h"
 #include "./truco-node.h"

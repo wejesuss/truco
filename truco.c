@@ -1,10 +1,11 @@
 // #include "./types.h"
 // #include "./players.h"
 // #include "./cards.h"
+#include "./lib/types.h"
 #include "./lib/deck/cards.h"
+#include "./lib/alloc/malloc-list.h"
 #include "./lib/state/truco-state.h"
 #include "./lib/tree/truco-node.h"
-#include "./lib/alloc/malloc-list.h"
 
 void show_final_victor(int user_tentos, int cpu_tentos);
 void show_state(trucoState state);
@@ -27,20 +28,20 @@ int main()
   show_state(rootstate);
 
   moves_available moves = {.quantity = 0, .list = malloc(sizeof(card) * 3)};
-  while (get_moves(&rootstate, &moves).quantity != 0)
-  {
-    card move;
-    if (rootstate.playerToMove == 1)
-    {
-      // move = MCTS(&rootstate, 500);
-    }
-    else
-    {
-      // move = MCTS(&rootstate, 100);
-    }
+  // while (get_moves(&rootstate, &moves).quantity != 0)
+  // {
+  //   card move;
+  //   if (rootstate.playerToMove == 1)
+  //   {
+  //     // move = MCTS(&rootstate, 500);
+  //   }
+  //   else
+  //   {
+  //     // move = MCTS(&rootstate, 100);
+  //   }
 
-    do_move(&rootstate, move);
-  }
+  //   do_move(&rootstate, move);
+  // }
 
   // set_deck();
 
@@ -80,7 +81,7 @@ void show_state(trucoState state)
   printf("\nCurrent Trick: %i\n", state.currentTrick);
   printf("Next Player to Move: %i\n", state.playerToMove);
   printf("User Score: %i | CPU Score: %i\n", state.playerTentos[0], state.playerTentos[1]);
-  show_players_cards(&state.playerHands[0], &state.playerHands[1]);
+  show_players_cards(state.playerHands[0].cards, state.playerHands[1].cards);
 
   for (int trick = 0; trick <= state.currentTrick; trick++)
   {

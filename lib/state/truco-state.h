@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdbool.h>
-#include <math.h>
 
 #define TOTAL_CARDS_NUMBER 40
 #define TOTAL_HAND_CARDS_NUMBER 3
