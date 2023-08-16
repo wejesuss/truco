@@ -15,6 +15,6 @@ tree:
 clean:
 		rm -f alloc.o deck.o state.o tree.o truco.o truco
 
-truco: clean deck alloc state tree
+truco: deck alloc state tree
 		${CC} -c truco.c -o truco.o
 		${CC} truco.o deck.o alloc.o state.o tree.o -lm -o truco

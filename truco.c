@@ -43,19 +43,6 @@ int main()
   //   do_move(&rootstate, move);
   // }
 
-  // set_deck();
-
-  // player user = get_user(), cpu = get_cpu();
-  // reset_players();
-
-  // while ((*user.player_tentos) < 12 && (*cpu.player_tentos) < 12)
-  // {
-  //   play_hand(&user, &cpu);
-  // }
-
-  // show_final_victor((*user.player_tentos), (*cpu.player_tentos));
-  // fflush(stdout);
-
   free(moves.list);
   unset_malloc_list(&malloc_list);
 

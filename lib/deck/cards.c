@@ -205,8 +205,8 @@ void show_players_cards(card *user_hand, card *cpu_hand)
   printf("\n\nPlayers cards\n");
   for (int i = 0; i < 3; i++)
   {
-    printf("%i %i - ", user_hand->value, user_hand->played);
-    printf("%i %i\n", cpu_hand->value, cpu_hand->played);
+    printf("%i %i - ", user_hand[i].value, user_hand[i].played);
+    printf("%i %i\n", cpu_hand[i].value, cpu_hand[i].played);
   }
 
   printf("\n");
