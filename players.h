@@ -1,5 +1,3 @@
-#include "./types.h"
-
 typedef struct player_action
 {
   int choice;
@@ -19,8 +17,7 @@ player get_cpu();
 void reset_players();
 enum truco_options ask_cpu_truco();
 enum truco_options ask_user_truco();
-player_action get_cpu_action(card *cpu_cards);
-player_action get_user_action(card *user_cards);
-int show_player_cards(card *player_cards);
-void show_instruction(int available);
+player_action get_cpu_action(int choice, card *cpu_cards, bool is_hand_of_ten);
+player_action get_user_action(card *user_cards, bool is_hand_of_ten);
+void show_instruction(int available, bool is_hand_of_ten);
 void show_played_cards(card user_card, card cpu_card);

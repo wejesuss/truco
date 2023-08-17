@@ -1,34 +1,22 @@
+#include "./lib/types.h"
+#include "./lib/deck/cards.h"
+#include "./types.h"
 #include "./players.h"
 
 player user, cpu;
-int user_tentos = 0;
-int cpu_tentos = 0;
 
-void reset_players()
+int get_available_cards(card *player_cards)
 {
-  user_tentos = cpu_tentos = 0;
-}
-
-player get_user()
-{
-  user.player_tentos = &user_tentos;
-  return user;
-}
-
-player get_cpu()
-{
-  cpu.player_tentos = &cpu_tentos;
-  return cpu;
-}
-
-bool is_hand_of_ten()
-{
-  if (user_tentos == 10 || cpu_tentos == 10)
+  int available = 0;
+  for (int i = 0; i < 3; i++)
   {
-    return true;
+    if (!player_cards[i].played)
+    {
+      available++;
+    }
   }
 
-  return false;
+  return available;
 }
 
 bool percentage_random(int percentage)
@@ -47,35 +35,43 @@ bool percentage_random(int percentage)
   }
 }
 
-player_action get_cpu_action(card *cpu_cards)
+player_action get_cpu_action(int choice, card *cpu_cards, bool is_hand_of_ten)
 {
-  printf("Cartas do CPU são: ");
-  int available = show_player_cards(cpu_cards);
-  printf("\n");
+  int available = get_available_cards(cpu_cards);
 
   player_action cpu_action = {
       .asked_truco = false,
-      .choice = 0,
+      .choice = choice,
       .hid_card = false};
 
-  cpu_action.choice = (rand() % available) + 1;
-  if (!is_hand_of_ten())
+  if (!is_hand_of_ten)
   {
     // randomize if cpu will ask truco - 40% chance to ask truco
     cpu_action.asked_truco = percentage_random(40);
     if (available != 3)
     {
-      //  randomize if cpu will hide card - 15% chance to hide card
+      // randomize if cpu will hide card - 15% chance to hide card
       cpu_action.hid_card = percentage_random(15);
     }
   }
 
+  // TODO: Create heuristic to determinize if cpu is winning or losing this round
+  // if winning it CAN hide its cards, otherwise it will NOT hide its card
+  // anyway card hiding will only get a 15% chance to happen, UNLESS it has a trump card in hand
+  // in this case it will have a 40% chance to hide its card
+
+  // TODO: Create heuristic to determinize if cpu is winning or losing this round
+  // if winning it CAN ask truco, if cpu has good cards it has 70% chance to ask truco
+  // if it does not have good cards but is winning it will only have 40% chance to ask truco
+  // if not winning it CAN ask truco if it has good cards with 30% chance to happen
+  // otherwise it CAN bluff with 15% chance to happen
+
   return cpu_action;
 }
 
-player_action get_choice(int available)
+player_action get_choice(int available, bool is_hand_of_ten)
 {
-  show_instruction(available);
+  show_instruction(available, is_hand_of_ten);
   fflush(stdout);
 
   player_action action = {
@@ -91,13 +87,13 @@ player_action get_choice(int available)
       break;
     }
 
-    if (c == 't' && !is_hand_of_ten())
+    if (c == 't' && !is_hand_of_ten)
     {
       action.asked_truco = true;
       continue;
     }
 
-    if (c == '?' && available != 3 && !is_hand_of_ten())
+    if (c == '?' && available != 3 && !is_hand_of_ten)
     {
       action.hid_card = true;
       continue;
@@ -113,11 +109,9 @@ player_action get_choice(int available)
   return action;
 }
 
-player_action get_user_action(card *user_cards)
+player_action get_user_action(card *user_cards, bool is_hand_of_ten)
 {
-  printf("Suas cartas são: ");
-  int available = show_player_cards(user_cards);
-  printf("\n");
+  int available = get_available_cards(user_cards);
 
   player_action action = {
       .choice = 0,
@@ -126,30 +120,10 @@ player_action get_user_action(card *user_cards)
 
   while (action.choice < 1 || action.choice > available)
   {
-    action = get_choice(available);
+    action = get_choice(available, is_hand_of_ten);
   }
 
   return action;
-}
-
-int show_player_cards(card *player_cards)
-{
-  char cardname[15];
-  int available = 0;
-  for (size_t i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
-  {
-    card card = player_cards[i];
-
-    if (card.available)
-    {
-      available++;
-      printf("%s ", get_card_name(&cardname[i * 5], card.suit, card.rank));
-    }
-  }
-
-  printf("\n");
-
-  return available;
 }
 
 enum truco_options ask_cpu_truco()
@@ -188,22 +162,25 @@ enum truco_options ask_user_truco()
     fflush(stdout);
     c = getchar();
 
-    if (c == 'n')
+    switch (c)
     {
+    case 'n':
       option = deny;
       valid_answer = true;
-    }
+      break;
 
-    if (c == 's')
-    {
+    case 's':
       option = accept;
       valid_answer = true;
-    }
+      break;
 
-    if (c == 't')
-    {
+    case 't':
       option = retruco;
       valid_answer = true;
+      break;
+
+    default:
+      break;
     }
 
     while ((c = getchar()) != EOF && c != '\n')
@@ -213,9 +190,9 @@ enum truco_options ask_user_truco()
   return option;
 }
 
-void show_instruction(int available)
+void show_instruction(int available, bool is_hand_of_ten)
 {
-  if (!is_hand_of_ten())
+  if (!is_hand_of_ten)
   {
     printf("\nPeça truco com 't'");
 
