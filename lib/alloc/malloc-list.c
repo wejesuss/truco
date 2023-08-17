@@ -9,8 +9,6 @@ alloc_list get_malloc_list(unsigned int quantity)
   malloc_list.list = malloc(sizeof(void *) * quantity);
   malloc_list.quantity = quantity;
 
-  printf("%p\n", malloc_list.list);
-
   return malloc_list;
 }
 
