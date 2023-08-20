@@ -86,7 +86,7 @@ card get_card(int index, int limit)
   }
 }
 
-card get_card_from_hand(card *player_cards, int choice)
+card *get_card_from_hand(card *player_cards, int choice)
 {
   card player_card;
   int pos = 0, found = 0;
@@ -101,14 +101,13 @@ card get_card_from_hand(card *player_cards, int choice)
 
     if (found == choice)
     {
-      player_cards[pos].played = true;
       break;
     }
 
     pos++;
   }
 
-  return player_card;
+  return &player_cards[pos];
 }
 
 void hide_card(card *player_card)

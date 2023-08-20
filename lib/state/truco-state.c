@@ -366,3 +366,11 @@ void do_move(trucoState *state, card move)
     }
   }
 }
+
+/// @brief Check if current round is hand of ten
+/// @param state The state to analyse
+/// @return True if either player has ten tentos, False otherwise
+bool is_hand_of_ten(trucoState *state)
+{
+  return (state->playerTentos[0] == 10 || state->playerTentos[1] == 10);
+}

@@ -1,8 +1,6 @@
-// #include "./types.h"
-// #include "./players.h"
-// #include "./cards.h"
 #include "./lib/types.h"
 #include "./lib/deck/cards.h"
+#include "./players.h"
 #include "./lib/alloc/malloc-list.h"
 #include "./lib/state/truco-state.h"
 #include "./lib/tree/truco-node.h"
@@ -108,7 +106,7 @@ int main()
   trucoState rootstate = {
       .stake = 2,
       .currentTrick = 0,
-      .playerToMove = 2,
+      .playerToMove = 1,
       .playerTentos = {0, 0}};
 
   deal(&rootstate);
@@ -120,7 +118,31 @@ int main()
     card move;
     if (rootstate.playerToMove == 1)
     {
-      move = MCTS(&rootstate, 500);
+      card *user_cards = rootstate.playerHands[0].cards;
+      // TODO: Ask user for card
+      player_action user_action =
+          get_user_action(user_cards,
+                          is_hand_of_ten(&rootstate));
+
+      // He can decide to play a card and ask truco/hide card
+      // If asked truco, should get an answer from cpu
+      if (user_action.asked_truco)
+      {
+        // TODO: ask cpu truco possibily re-asking in some cases
+        // and finishing game if denied
+      }
+
+      // if hide card, alter move so that cpu does not see user card
+      // choice first
+      card *user_card = get_card_from_hand(user_cards, user_action.choice);
+
+      if (user_action.hid_card)
+      {
+        // hide after
+        hide_card(user_card);
+      }
+
+      move = *user_card;
     }
     else
     {

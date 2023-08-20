@@ -12,9 +12,6 @@ enum truco_options
   retruco // ask truco again
 };
 
-player get_user();
-player get_cpu();
-void reset_players();
 enum truco_options ask_cpu_truco();
 enum truco_options ask_user_truco();
 player_action get_cpu_action(int choice, card *cpu_cards, bool is_hand_of_ten);
