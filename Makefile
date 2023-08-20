@@ -12,9 +12,12 @@ state:
 tree:
 		${CC} -c ./lib/tree/truco-node.c -o tree.o
 
-clean:
-		rm -f alloc.o deck.o state.o tree.o truco.o truco
+players:
+		${CC} -c ./players.c -o players.o
 
-truco: deck alloc state tree
+clean:
+		rm -f alloc.o deck.o state.o tree.o players.o truco.o truco
+
+truco: deck alloc state tree players
 		${CC} -c truco.c -o truco.o
-		${CC} truco.o deck.o alloc.o state.o tree.o -lm -o truco
+		${CC} truco.o deck.o alloc.o state.o tree.o players.o -lm -o truco
