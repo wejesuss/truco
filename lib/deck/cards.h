@@ -1,4 +1,3 @@
-
 #define TOTAL_CARDS_NUMBER 40
 #define TOTAL_HAND_CARDS_NUMBER 3
 #define NUMBER_OF_PLAYERS 2
@@ -49,15 +48,12 @@ typedef struct card
 // Deck
 void set_deck();
 card *get_deck();
+void shuffle_cards();
 void draw_cards(card *user_cards, card *cpu_cards);
-// void hide_card(card *player_card);
 card create_card(bool available, enum rank rank, enum suits suit, int value);
+void hide_card(card *player_card);
 bool is_same_card(card reference, card move);
-char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
 card get_card(int index, int limit);
 card *get_card_from_hand(card *player_cards, int choice);
-void hide_card(card *player_card);
-// Shuffle algorithm by Ben Pfaff's Writings
-// see https://benpfaff.org/writings/clc/shuffle.html
-void shuffle_cards();
 void show_players_cards(card *user_hand, card *cpu_hand);
+char *get_card_name(char cardname[5], enum suits suit, enum rank rank);

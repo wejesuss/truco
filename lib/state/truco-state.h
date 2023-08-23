@@ -62,7 +62,5 @@ void do_move(trucoState *state, card move);
 bool is_hand_of_ten(trucoState *state);
 int get_result(int tentos);
 
-// Deck
-
 // Match
 void play_hand(card *cards, trucoState *state);
