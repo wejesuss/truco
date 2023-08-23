@@ -17,15 +17,15 @@ This is a temporary change, don't worry. This will change you set of characters 
 - [X] Add other truco functionalities (e.g. ask for truco, hide card)
 - [X] Create distinct and sharable interfaces for truco state and MCTS nodes
 - [ ] Fix other minor bugs
-- [ ] Create CPU "AI" (something better than random decision)
+- [X] Create CPU "AI" (something better than random decision)
 
 
 ### TODO Details
 
 - [X] ReCreate state manager to control player to move, tentos, truco asking and others to allow control and copying of the state for futurre ismcts functions
 
-- [ ] Create a "last-asking-player" property on truco state that sinalizes which player has asked truco last, to block or allow a player to ask truco next
+- [X] Create a "last-asking-player" property on truco state that sinalizes which player has asked truco last, to block or allow a player to ask truco next
 
-- [ ] Limit asking truco if stake will end beyond limit of 12
+- [X] Limit asking truco if stake will end beyond limit of 12
 
-- [ ] Deal with truco 3 possibilities (deny, accept, retruco)
+- [X] Deal with truco 3 possibilities (deny, accept, retruco)
