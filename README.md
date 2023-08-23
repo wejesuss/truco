@@ -22,4 +22,10 @@ This is a temporary change, don't worry. This will change you set of characters 
 
 ### TODO Details
 
-- [ ] ReCreate state manager to control player to move, tentos, truco asking and others to allow control and copying of the state for futurre ismcts functions
+- [X] ReCreate state manager to control player to move, tentos, truco asking and others to allow control and copying of the state for futurre ismcts functions
+
+- [ ] Create a "last-asking-player" property on truco state that sinalizes which player has asked truco last, to block or allow a player to ask truco next
+
+- [ ] Limit asking truco if stake will end beyond limit of 12
+
+- [ ] Deal with truco 3 possibilities (deny, accept, retruco)
