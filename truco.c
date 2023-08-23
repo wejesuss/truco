@@ -7,6 +7,9 @@
 
 void show_final_victor(int user_tentos, int cpu_tentos);
 void show_state(trucoState state);
+void raise_stake(trucoState *state);
+bool cpu_asking_truco(trucoState *state);
+bool user_asking_truco(trucoState *state);
 
 // global registry of allocations
 alloc_list malloc_list;
@@ -96,6 +99,82 @@ card MCTS(trucoState *roostate, int itermax)
   return better_move;
 }
 
+void raise_stake(trucoState *state)
+{
+  if (state->stake < 12)
+  {
+    state->stake += state->stake == 4 ? 4 : 2;
+  }
+}
+
+/// @brief Ask other player for truco, reasking if needed (from pov of other player)
+/// @param state State to be used to sync last asking player and tentos if truco is denied
+/// @return True if truco was denied by either player, False otherwise
+bool cpu_asking_truco(trucoState *state)
+{
+  printf("\nStake: %i\n", state->stake);
+
+  enum truco_options decision = ask_user_truco();
+  state->lastAskingPlayer = 2;
+
+  switch (decision)
+  {
+  case deny:
+    state->playerTentos[1] += state->stake;
+    deal(state);
+    return true;
+    break;
+
+  case accept:
+    raise_stake(state);
+    break;
+
+  case retruco:
+    raise_stake(state);
+    return user_asking_truco(state);
+    break;
+
+  default:
+    break;
+  }
+
+  return false;
+}
+
+/// @brief Ask other player for truco, reasking if needed (from pov of other player)
+/// @param state State to be used to sync last asking player and tentos if truco is denied
+/// @return True if truco was denied by either player, False otherwise
+bool user_asking_truco(trucoState *state)
+{
+  printf("\nStake: %i\n", state->stake);
+
+  enum truco_options decision = ask_cpu_truco();
+  state->lastAskingPlayer = 1;
+
+  switch (decision)
+  {
+  case deny:
+    state->playerTentos[0] += state->stake;
+    deal(state);
+    return true;
+    break;
+
+  case accept:
+    raise_stake(state);
+    break;
+
+  case retruco:
+    raise_stake(state);
+    return cpu_asking_truco(state);
+    break;
+
+  default:
+    break;
+  }
+
+  return false;
+}
+
 int main()
 {
   printf("Truco\n\n");
@@ -107,29 +186,37 @@ int main()
       .stake = 2,
       .currentTrick = 0,
       .playerToMove = 1,
+      .lastAskingPlayer = -1,
       .playerTentos = {0, 0}};
 
   deal(&rootstate);
-  show_state(rootstate);
 
   moves_available moves = {.quantity = 0, .list = malloc(sizeof(card) * 3)};
   while (get_moves(&rootstate, &moves).quantity != 0)
   {
+    show_state(rootstate);
+
     card move;
     if (rootstate.playerToMove == 1)
     {
       card *user_cards = rootstate.playerHands[0].cards;
-      // TODO: Ask user for card
       player_action user_action =
           get_user_action(user_cards,
                           is_hand_of_ten(&rootstate));
 
       // He can decide to play a card and ask truco/hide card
       // If asked truco, should get an answer from cpu
-      if (user_action.asked_truco)
+      if (user_action.asked_truco && rootstate.lastAskingPlayer != 1)
       {
         // TODO: ask cpu truco possibily re-asking in some cases
-        // and finishing game if denied
+        // and finishing round if denied
+        bool truco_denied = user_asking_truco(&rootstate);
+        if (truco_denied)
+        {
+          continue;
+        }
+
+        printf("%i\n", rootstate.stake);
       }
 
       // if hide card, alter move so that cpu does not see user card
@@ -146,11 +233,11 @@ int main()
     }
     else
     {
-      move = MCTS(&rootstate, 100);
+      move = MCTS(&rootstate, 1000);
     }
 
     do_move(&rootstate, move);
-    show_state(rootstate);
+    // show_state(rootstate);
   }
 
   free(moves.list);

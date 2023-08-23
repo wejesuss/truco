@@ -71,6 +71,7 @@ void deal(trucoState *state)
 {
   state->stake = 2;
   state->currentTrick = 0;
+  state->lastAskingPlayer = -1;
   resetHands(state->playerHands);
   resetTricks(state->tricks);
 
@@ -100,6 +101,7 @@ trucoState clone(trucoState *state)
   copy.stake = state->stake;
   copy.currentTrick = state->currentTrick;
   copy.playerToMove = state->playerToMove;
+  copy.lastAskingPlayer = state->lastAskingPlayer;
   copy.playerTentos[0] = state->playerTentos[0];
   copy.playerTentos[1] = state->playerTentos[1];
 
