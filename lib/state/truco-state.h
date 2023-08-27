@@ -58,6 +58,7 @@ trucoState clone(trucoState *state);
 trucoState clone_randomizing(trucoState *state, int player);
 void deal(trucoState *state);
 moves_available get_moves(trucoState *state, moves_available *moves);
+int findMoveInHand(playerHand *hand, card move);
 void do_move(trucoState *state, card move);
 bool is_hand_of_ten(trucoState *state);
 int get_result(int tentos);

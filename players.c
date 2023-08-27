@@ -35,13 +35,12 @@ bool percentage_random(int percentage)
   }
 }
 
-player_action get_cpu_action(int choice, card *cpu_cards, bool is_hand_of_ten)
+player_action get_cpu_action(card *cpu_cards, bool is_hand_of_ten)
 {
   int available = get_available_cards(cpu_cards);
 
   player_action cpu_action = {
       .asked_truco = false,
-      .choice = choice,
       .hid_card = false};
 
   if (!is_hand_of_ten)

@@ -233,7 +233,37 @@ int main()
     }
     else
     {
+      playerHand *cpu_hand = &rootstate.playerHands[1];
+      card *cpu_cards = cpu_hand->cards;
+      player_action cpu_action =
+          get_cpu_action(cpu_cards,
+                         is_hand_of_ten(&rootstate));
+
+      printf("truco: %d   hide: %d\n", cpu_action.asked_truco, cpu_action.hid_card);
+      // It can decide to play a card and ask truco/hide card
+      // If asked truco, should get an answer from user
+      if (cpu_action.asked_truco && rootstate.lastAskingPlayer != 2)
+      {
+        // TODO: ask user truco possibily re-asking in some cases
+        // and finishing round if denied
+        bool truco_denied = cpu_asking_truco(&rootstate);
+        if (truco_denied)
+        {
+          continue;
+        }
+
+        printf("%i\n", rootstate.stake);
+      }
+
       move = MCTS(&rootstate, 1000);
+
+      // if hide card, alter move so that user does not see cpu card
+      if (cpu_action.hid_card)
+      {
+        int pos = findMoveInHand(cpu_hand, move);
+        hide_card(&cpu_hand->cards[pos]);
+        move = cpu_hand->cards[pos];
+      }
     }
 
     do_move(&rootstate, move);
