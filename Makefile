@@ -16,8 +16,9 @@ players:
 		${CC} -c ./players.c -o players.o
 
 clean:
-		rm -f alloc.o deck.o state.o tree.o players.o truco.o truco
+		rm -f alloc.o deck.o state.o tree.o players.o truco.o
 
-truco: deck alloc state tree players
+truco: clean deck alloc state tree players
+		rm -rf truco
 		${CC} -c truco.c -o truco.o
 		${CC} truco.o deck.o alloc.o state.o tree.o players.o -lm -o truco
