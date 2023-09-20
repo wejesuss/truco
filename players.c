@@ -73,8 +73,9 @@ player_action get_choice(int available, bool is_hand_of_ten)
   show_instruction(available, is_hand_of_ten);
   fflush(stdout);
 
+  int choice = 0;
   player_action action = {
-      .choice = 0,
+      .choice = NULL,
       .asked_truco = false,
       .hid_card = false};
 
@@ -98,10 +99,10 @@ player_action get_choice(int available, bool is_hand_of_ten)
       continue;
     }
 
-    if (c >= '1' && c <= '3' && action.choice == 0)
+    if (c >= '1' && c <= '3' && choice == 0)
     {
       // converting character to a number
-      action.choice = c - '0';
+      choice = c - '0';
     }
   }
 
@@ -110,16 +111,18 @@ player_action get_choice(int available, bool is_hand_of_ten)
 
 player_action get_user_action(card *user_cards, bool is_hand_of_ten)
 {
+  int choice = 0;
   int available = get_available_cards(user_cards);
 
   player_action action = {
-      .choice = 0,
+      .choice = NULL,
       .asked_truco = false,
       .hid_card = false};
 
-  while (action.choice < 1 || action.choice > available)
+  while (choice < 1 || choice > available)
   {
     action = get_choice(available, is_hand_of_ten);
+    action.choice = get_card_from_hand(user_cards, choice);
   }
 
   return action;

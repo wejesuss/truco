@@ -220,16 +220,12 @@ int main()
       }
 
       // if hide card, alter move so that cpu does not see user card
-      // choice first
-      card *user_card = get_card_from_hand(user_cards, user_action.choice);
-
       if (user_action.hid_card)
       {
-        // hide after
-        hide_card(user_card);
+        hide_card(user_action.choice);
       }
 
-      move = *user_card;
+      move = *user_action.choice;
     }
     else
     {

@@ -1,6 +1,6 @@
 typedef struct player_action
 {
-  int choice;
+  card *choice;
   bool asked_truco;
   bool hid_card;
 } player_action;
