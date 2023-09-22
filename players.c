@@ -96,12 +96,7 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
 
   float randomization_chance = ((1 + game_score) * hand_score) / 2;
 
-  if (hand_score > 0.6)
-  {
-    // hand_score /= 2;
-  }
-
-  printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
+  // printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
 
   // Mixing these two number in some way will result in an average number that will define chance of hiding card
   // This chance will be randomized and if drawn in range cpu will hide its card
