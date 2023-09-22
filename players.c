@@ -61,7 +61,10 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   float hand_score = 0;
   for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
-    hand_score += (cpu_cards[i].value / 14.0);
+    if (!cpu_cards[i].played)
+    {
+      hand_score += (cpu_cards[i].value / 14.0);
+    }
   }
   // Calculate average quality of cpu hand
   hand_score /= 3.0;
@@ -91,11 +94,7 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   stake_riskiness = (game_score > 0) ? 1 - stake_riskiness : 1 + stake_riskiness;
   game_score = game_score * stake_riskiness + trick_score;
 
-  float randomization_chance = (1 + game_score) * hand_score;
-  if (game_score > 0)
-  {
-    randomization_chance /= 2;
-  }
+  float randomization_chance = ((1 + game_score) * hand_score) / 2;
 
   if (hand_score > 0.6)
   {
