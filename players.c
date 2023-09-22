@@ -68,7 +68,7 @@ player_action get_cpu_action(card *cpu_cards, bool is_hand_of_ten)
   return cpu_action;
 }
 
-player_action get_choice(int available, bool is_hand_of_ten)
+player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
 {
   show_instruction(available, is_hand_of_ten);
   fflush(stdout);
@@ -79,53 +79,46 @@ player_action get_choice(int available, bool is_hand_of_ten)
       .asked_truco = false,
       .hid_card = false};
 
-  char c;
-  while ((c = getchar()))
+  while (choice < 1 || choice > available)
   {
-    if (c == EOF || c == '\n')
+    char c;
+    while ((c = getchar()))
     {
-      break;
-    }
+      if (c == EOF || c == '\n')
+      {
+        break;
+      }
 
-    if (c == 't' && !is_hand_of_ten)
-    {
-      action.asked_truco = true;
-      continue;
-    }
+      if (c == 't' && !is_hand_of_ten)
+      {
+        action.asked_truco = true;
+        continue;
+      }
 
-    if (c == '?' && available != 3 && !is_hand_of_ten)
-    {
-      action.hid_card = true;
-      continue;
-    }
+      if (c == '?' && available != 3 && !is_hand_of_ten)
+      {
+        action.hid_card = true;
+        continue;
+      }
 
-    if (c >= '1' && c <= '3' && choice == 0)
-    {
-      // converting character to a number
-      choice = c - '0';
+      if (c >= '1' && c <= '3' && choice == 0)
+      {
+        // converting character to a number
+        choice = c - '0';
+      }
     }
   }
+
+  action.choice = get_card_from_hand(user_cards, choice);
 
   return action;
 }
 
 player_action get_user_action(card *user_cards, bool is_hand_of_ten)
 {
-  int choice = 0;
   int available = get_available_cards(user_cards);
 
-  player_action action = {
-      .choice = NULL,
-      .asked_truco = false,
-      .hid_card = false};
-
-  while (choice < 1 || choice > available)
-  {
-    action = get_choice(available, is_hand_of_ten);
-    action.choice = get_card_from_hand(user_cards, choice);
-  }
-
-  return action;
+  return get_choice(user_cards, available, is_hand_of_ten);
 }
 
 enum truco_options ask_cpu_truco()
