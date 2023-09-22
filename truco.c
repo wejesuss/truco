@@ -1,9 +1,9 @@
 #include "./lib/types.h"
 #include "./lib/deck/cards.h"
-#include "./players.h"
 #include "./lib/alloc/malloc-list.h"
 #include "./lib/state/truco-state.h"
 #include "./lib/tree/truco-node.h"
+#include "./players.h"
 
 void show_final_victor(int user_tentos, int cpu_tentos);
 void show_state(trucoState state);
@@ -231,9 +231,7 @@ int main()
     {
       playerHand *cpu_hand = &rootstate.playerHands[1];
       card *cpu_cards = cpu_hand->cards;
-      player_action cpu_action =
-          get_cpu_action(cpu_cards,
-                         is_hand_of_ten(&rootstate));
+      player_action cpu_action = get_cpu_action(&rootstate, is_hand_of_ten(&rootstate));
 
       printf("truco: %d   hide: %d\n", cpu_action.asked_truco, cpu_action.hid_card);
       // It can decide to play a card and ask truco/hide card

@@ -1,6 +1,7 @@
 #include "./lib/types.h"
 #include "./lib/deck/cards.h"
 #include "./types.h"
+#include "./lib/state/truco-state.h"
 #include "./players.h"
 
 player user, cpu;
@@ -35,8 +36,10 @@ bool percentage_random(int percentage)
   }
 }
 
-player_action get_cpu_action(card *cpu_cards, bool is_hand_of_ten)
+player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
 {
+  card *cpu_cards = state->playerHands[1].cards;
+
   int available = get_available_cards(cpu_cards);
 
   player_action cpu_action = {
@@ -54,10 +57,56 @@ player_action get_cpu_action(card *cpu_cards, bool is_hand_of_ten)
     }
   }
 
-  // TODO: Create heuristic to determinize if cpu is winning or losing this round
-  // if winning it CAN hide its cards, otherwise it will NOT hide its card
-  // anyway card hiding will only get a 15% chance to happen, UNLESS it has a trump card in hand
-  // in this case it will have a 40% chance to hide its card
+  // Generate hand score using all cards in hand
+  float hand_score = 0;
+  for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
+  {
+    hand_score += (cpu_cards[i].value / 14.0);
+  }
+  // Calculate average quality of cpu hand
+  hand_score /= 3.0;
+
+  // (cpu_tentos - user_tentos) / 12
+  float game_score = ((float)state->playerTentos[1] - (float)state->playerTentos[0]) / 12.0;
+  float stake_riskiness = (float)state->stake * 0.05; // 0.1/0.2/0.4/0.5
+  float trick_score = 0;
+
+  for (int i = 0; i < state->currentTrick; i++)
+  {
+    // POV of player 1
+    if (state->tricks[i].result == WIN)
+    {
+      trick_score -= 0.25;
+    }
+    else if (state->tricks[i].result == LOSE)
+    {
+      trick_score += 0.10;
+    }
+    else
+    {
+      trick_score -= 0.10;
+    }
+  }
+
+  stake_riskiness = (game_score > 0) ? 1 - stake_riskiness : 1 + stake_riskiness;
+  game_score = game_score * stake_riskiness + trick_score;
+
+  float randomization_chance = (1 + game_score) * hand_score;
+  if (game_score > 0)
+  {
+    randomization_chance /= 2;
+  }
+
+  if (hand_score > 0.6)
+  {
+    // hand_score /= 2;
+  }
+
+  printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
+
+  // Mixing these two number in some way will result in an average number that will define chance of hiding card
+  // This chance will be randomized and if drawn in range cpu will hide its card
+  // anyway if not in range, cpu still should have slow chance of bluffing (between 5-15)
 
   // TODO: Create heuristic to determinize if cpu is winning or losing this round
   // if winning it CAN ask truco, if cpu has good cards it has 70% chance to ask truco
