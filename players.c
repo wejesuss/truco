@@ -50,11 +50,6 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   {
     // randomize if cpu will ask truco - 40% chance to ask truco
     cpu_action.asked_truco = percentage_random(40);
-    if (available != 3)
-    {
-      // randomize if cpu will hide card - 15% chance to hide card
-      cpu_action.hid_card = percentage_random(15);
-    }
   }
 
   // Generate hand score using all cards in hand
@@ -95,9 +90,15 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   game_score = game_score * stake_riskiness + trick_score;
 
   float randomization_chance = ((1 + game_score) * hand_score) / 2;
+  int rand_chance = randomization_chance * 100;
 
-  // printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
+  printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
 
+  if (available != 3)
+  {
+    // randomize if cpu will hide card - rand_chance chance to hide card
+    cpu_action.hid_card = percentage_random(rand_chance);
+  }
   // Mixing these two number in some way will result in an average number that will define chance of hiding card
   // This chance will be randomized and if drawn in range cpu will hide its card
   // anyway if not in range, cpu still should have slow chance of bluffing (between 5-15)
