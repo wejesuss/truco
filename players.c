@@ -113,9 +113,6 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
 
 player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
 {
-  show_instruction(available, is_hand_of_ten);
-  fflush(stdout);
-
   int choice = 0;
   player_action action = {
       .choice = NULL,
@@ -124,6 +121,10 @@ player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
 
   while (choice < 1 || choice > available)
   {
+    show_instruction(available, is_hand_of_ten);
+    fflush(stdout);
+
+    choice = 0;
     char c;
     while ((c = getchar()))
     {
