@@ -68,6 +68,7 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   float game_score = ((float)state->playerTentos[1] - (float)state->playerTentos[0]) / 12.0;
   float stake_riskiness = (float)state->stake * 0.05; // 0.1/0.2/0.4/0.5
   float trick_score = 0;
+  bool will_lose_round = false;
 
   for (int i = 0; i < state->currentTrick; i++)
   {
@@ -75,6 +76,7 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
     if (state->tricks[i].result == WIN)
     {
       trick_score -= 0.25;
+      will_lose_round = true;
     }
     else if (state->tricks[i].result == LOSE)
     {
@@ -84,6 +86,12 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
     {
       trick_score -= 0.10;
     }
+  }
+
+  if (will_lose_round)
+  {
+    cpu_action.hid_card = false;
+    return cpu_action;
   }
 
   stake_riskiness = (game_score > 0) ? 1 - stake_riskiness : 1 + stake_riskiness;
@@ -99,9 +107,6 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
     // randomize if cpu will hide card - rand_chance chance to hide card
     cpu_action.hid_card = percentage_random(rand_chance);
   }
-  // Mixing these two number in some way will result in an average number that will define chance of hiding card
-  // This chance will be randomized and if drawn in range cpu will hide its card
-  // anyway if not in range, cpu still should have slow chance of bluffing (between 5-15)
 
   // TODO: Create heuristic to determinize if cpu is winning or losing this round
   // if winning it CAN ask truco, if cpu has good cards it has 70% chance to ask truco

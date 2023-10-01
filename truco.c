@@ -232,6 +232,7 @@ int main()
       playerHand *cpu_hand = &rootstate.playerHands[1];
       card *cpu_cards = cpu_hand->cards;
       player_action cpu_action = get_cpu_action(&rootstate, is_hand_of_ten(&rootstate));
+      move = MCTS(&rootstate, 1000);
 
       printf("truco: %d   hide: %d\n", cpu_action.asked_truco, cpu_action.hid_card);
       // It can decide to play a card and ask truco/hide card
@@ -249,9 +250,8 @@ int main()
         printf("%i\n", rootstate.stake);
       }
 
-      move = MCTS(&rootstate, 1000);
-
       // if hide card, alter move so that user does not see cpu card
+      // only hide if cpu will not lose the round
       if (cpu_action.hid_card)
       {
         int pos = findMoveInHand(cpu_hand, move);
