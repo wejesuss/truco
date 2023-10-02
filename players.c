@@ -36,22 +36,8 @@ bool percentage_random(int percentage)
   }
 }
 
-player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
+float get_hand_score(card *cpu_cards)
 {
-  card *cpu_cards = state->playerHands[1].cards;
-
-  int available = get_available_cards(cpu_cards);
-
-  player_action cpu_action = {
-      .asked_truco = false,
-      .hid_card = false};
-
-  if (!is_hand_of_ten)
-  {
-    // randomize if cpu will ask truco - 40% chance to ask truco
-    cpu_action.asked_truco = percentage_random(40);
-  }
-
   // Generate hand score using all cards in hand
   float hand_score = 0;
   for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
@@ -62,23 +48,21 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
     }
   }
   // Calculate average quality of cpu hand
-  hand_score /= 3.0;
+  return (hand_score / 3.0);
+}
 
-  // (cpu_tentos - user_tentos) / 12
-  float game_score = ((float)state->playerTentos[1] - (float)state->playerTentos[0]) / 12.0;
-  float stake_riskiness = (float)state->stake * 0.05; // 0.1/0.2/0.4/0.5
+float get_trick_score(int currentTrick, trick *tricks, bool *will_lose_round)
+{
   float trick_score = 0;
-  bool will_lose_round = false;
-
-  for (int i = 0; i < state->currentTrick; i++)
+  for (int i = 0; i < currentTrick; i++)
   {
     // POV of player 1
-    if (state->tricks[i].result == WIN)
+    if (tricks[i].result == WIN)
     {
       trick_score -= 0.25;
-      will_lose_round = true;
+      *will_lose_round = true;
     }
-    else if (state->tricks[i].result == LOSE)
+    else if (tricks[i].result == LOSE)
     {
       trick_score += 0.10;
     }
@@ -87,32 +71,47 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
       trick_score -= 0.10;
     }
   }
+}
 
-  if (will_lose_round)
-  {
-    cpu_action.hid_card = false;
-    return cpu_action;
-  }
-
+int get_hid_card_rand_chance(float game_score, float hand_score, float stake_riskiness, float trick_score)
+{
   stake_riskiness = (game_score > 0) ? 1 - stake_riskiness : 1 + stake_riskiness;
   game_score = game_score * stake_riskiness + trick_score;
 
   float randomization_chance = ((1 + game_score) * hand_score) / 2;
-  int rand_chance = randomization_chance * 100;
+  // printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
+  return randomization_chance * 100;
+}
 
-  printf("random: %f hand: %f game: %f\n", randomization_chance, hand_score, game_score);
+player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
+{
+  card *cpu_cards = state->playerHands[1].cards;
+
+  int available = get_available_cards(cpu_cards);
+
+  player_action cpu_action = {
+      .asked_truco = false,
+      .hid_card = false};
+
+  bool will_lose_round = false; // if hiding a card will result a defeat
+  float hand_score = get_hand_score(cpu_cards);
+  // (cpu_tentos - user_tentos) / 12
+  float game_score = ((float)state->playerTentos[1] - (float)state->playerTentos[0]) / 12.0;
+  float stake_riskiness = (float)state->stake * 0.05; // 0.1/0.2/0.4/0.5
+  float trick_score = get_trick_score(state->currentTrick, state->tricks, &will_lose_round);
+  int rand_chance = get_hid_card_rand_chance(game_score, hand_score, stake_riskiness, trick_score);
 
   if (available != 3 && !is_hand_of_ten)
   {
-    // randomize if cpu will hide card - rand_chance chance to hide card
-    cpu_action.hid_card = percentage_random(rand_chance);
+    // randomize if cpu will hide card - {rand_chance} chance to hide card
+    cpu_action.hid_card = percentage_random(!will_lose_round ? rand_chance : 0);
   }
 
-  // TODO: Create heuristic to determinize if cpu is winning or losing this round
-  // if winning it CAN ask truco, if cpu has good cards it has 70% chance to ask truco
-  // if it does not have good cards but is winning it will only have 40% chance to ask truco
-  // if not winning it CAN ask truco if it has good cards with 30% chance to happen
-  // otherwise it CAN bluff with 15% chance to happen
+  if (!is_hand_of_ten)
+  {
+    // randomize if cpu will ask truco - {rand_chance * 1.4} chance to ask truco
+    cpu_action.asked_truco = percentage_random(rand_chance * 1.4);
+  }
 
   return cpu_action;
 }
