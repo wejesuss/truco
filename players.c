@@ -109,8 +109,18 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
 
   if (!is_hand_of_ten)
   {
-    // randomize if cpu will ask truco - {rand_chance * 1.4} chance to ask truco
-    cpu_action.asked_truco = percentage_random(rand_chance * 1.4);
+    bool user_plays_first = state->tricks[state->currentTrick].firstPlay.player == 1;
+    int user_card = state->tricks[state->currentTrick].firstPlay.card.value;
+    if (user_plays_first && user_card == 14)
+    {
+      // prevent cpu from asking truco if user has already played a 4-clubs card
+      cpu_action.asked_truco = false;
+    }
+    else
+    {
+      // randomize if cpu will ask truco - {rand_chance * 1.4} chance to ask truco
+      cpu_action.asked_truco = percentage_random(rand_chance * 1.4);
+    }
   }
 
   return cpu_action;
