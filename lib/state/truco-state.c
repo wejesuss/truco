@@ -25,10 +25,14 @@ void resetTricks(trick *tricks)
 
     tricks[i].firstPlay.card.played = false;
     tricks[i].firstPlay.card.value = -1;
+    tricks[i].firstPlay.card.rank = facedown;
+    tricks[i].firstPlay.card.suit = facedown;
     tricks[i].firstPlay.player = -1;
 
     tricks[i].secondPlay.card.played = false;
     tricks[i].secondPlay.card.value = -1;
+    tricks[i].secondPlay.card.rank = facedown;
+    tricks[i].secondPlay.card.suit = facedown;
     tricks[i].secondPlay.player = -1;
   }
 }
@@ -287,7 +291,8 @@ int check_winner(trick *tricks, bool check_third_trick)
 /// Must update playerToMove.
 /// @param state The state to be used
 /// @param move The move to insert
-void do_move(trucoState *state, card move)
+/// @returns a trick struct representing last movements
+trick do_move(trucoState *state, card move)
 {
   trick *tricks = state->tricks;
   int currentTrick = state->currentTrick;
@@ -322,6 +327,7 @@ void do_move(trucoState *state, card move)
   // if current trick is secondPlay, then the trick is over
   if (trickIsOver)
   {
+    trick last_movement;
     trickplay firstPlay, secondPlay;
     int playsNext;
     firstPlay = tricks[currentTrick].firstPlay;
@@ -343,6 +349,7 @@ void do_move(trucoState *state, card move)
       tricks[currentTrick].result = get_trick_result(0);
     }
 
+    last_movement = tricks[currentTrick];
     // update game state
     state->currentTrick++;
     state->playerToMove = playsNext;
@@ -366,6 +373,12 @@ void do_move(trucoState *state, card move)
         deal(state);
       }
     }
+
+    return last_movement;
+  }
+  else
+  {
+    return tricks[currentTrick];
   }
 }
 

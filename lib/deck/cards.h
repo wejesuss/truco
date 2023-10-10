@@ -55,5 +55,6 @@ void hide_card(card *player_card);
 bool is_same_card(card reference, card move);
 card get_card(int index, int limit);
 card *get_card_from_hand(card *player_cards, int choice);
+void show_user_available_cards(card *user_hand);
 void show_players_cards(card *user_hand, card *cpu_hand);
-char *get_card_name(char cardname[5], enum suits suit, enum rank rank);
+char *get_card_name(char cardname[10], enum suits suit, enum rank rank);

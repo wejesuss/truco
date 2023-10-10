@@ -6,7 +6,7 @@
 #include "./players.h"
 
 void show_final_victor(int user_tentos, int cpu_tentos);
-void show_state(trucoState state);
+void show_state(trucoState *state);
 void raise_stake(trucoState *state);
 bool cpu_asking_truco(trucoState *state);
 bool user_asking_truco(trucoState *state);
@@ -112,7 +112,7 @@ void raise_stake(trucoState *state)
 /// @return True if truco was denied by either player, False otherwise
 bool cpu_asking_truco(trucoState *state)
 {
-  printf("\nStake: %i\n", state->stake);
+  printf("\nAposta: %i\n", state->stake);
 
   enum truco_options decision = ask_user_truco();
   state->lastAskingPlayer = 2;
@@ -146,7 +146,7 @@ bool cpu_asking_truco(trucoState *state)
 /// @return True if truco was denied by either player, False otherwise
 bool user_asking_truco(trucoState *state)
 {
-  printf("\nStake: %i\n", state->stake);
+  printf("\nAposta: %i\n", state->stake);
 
   enum truco_options decision = ask_cpu_truco();
   state->lastAskingPlayer = 1;
@@ -177,7 +177,7 @@ bool user_asking_truco(trucoState *state)
 
 int main()
 {
-  printf("Truco\n\n");
+  printf("Truco\n");
   fflush(stdout);
 
   srand(time(NULL));
@@ -194,7 +194,7 @@ int main()
   moves_available moves = {.quantity = 0, .list = malloc(sizeof(card) * 3)};
   while (get_moves(&rootstate, &moves).quantity != 0)
   {
-    show_state(rootstate);
+    show_state(&rootstate);
 
     card move;
     if (rootstate.playerToMove == 1)
@@ -215,8 +215,6 @@ int main()
         {
           continue;
         }
-
-        printf("%i\n", rootstate.stake);
       }
 
       // if hide card, alter move so that cpu does not see user card
@@ -234,7 +232,7 @@ int main()
       player_action cpu_action = get_cpu_action(&rootstate, is_hand_of_ten(&rootstate));
       move = MCTS(&rootstate, 1000);
 
-      printf("truco: %d   hide: %d\n", cpu_action.asked_truco, cpu_action.hid_card);
+      // printf("truco: %d   hide: %d\n", cpu_action.asked_truco, cpu_action.hid_card);
       // It can decide to play a card and ask truco/hide card
       // If asked truco, should get an answer from user
       if (cpu_action.asked_truco && rootstate.lastAskingPlayer != 2)
@@ -246,8 +244,6 @@ int main()
         {
           continue;
         }
-
-        printf("%i\n", rootstate.stake);
       }
 
       // if hide card, alter move so that user does not see cpu card
@@ -260,8 +256,9 @@ int main()
       }
     }
 
-    do_move(&rootstate, move);
-    // show_state(rootstate);
+    trick last_movement = do_move(&rootstate, move);
+    printf("\nLast Movement\nCarta 1: %i | Carta 2: %i\n", last_movement.firstPlay.card.value, last_movement.secondPlay.card.value);
+    printf("Resultado %i\n", last_movement.result);
   }
 
   free(moves.list);
@@ -282,21 +279,40 @@ void show_final_victor(int user_tentos, int cpu_tentos)
   }
 }
 
-void show_state(trucoState state)
+void show_state(trucoState *state)
 {
-  printf("\n -------- STATE --------\n");
-  printf("\nStake: %i\n", state.stake);
-  printf("\nCurrent Trick: %i\n", state.currentTrick);
-  printf("Next Player to Move: %i\n", state.playerToMove);
-  printf("User Score: %i | CPU Score: %i\n", state.playerTentos[0], state.playerTentos[1]);
-  show_players_cards(state.playerHands[0].cards, state.playerHands[1].cards);
-
-  for (int trick = 0; trick <= state.currentTrick; trick++)
+  printf("\nVez do jogador: %i", state->playerToMove);
+  if (state->playerToMove == 1)
   {
-    printf("\nTrick %i\nCard 1: %i | Card 2: %i\n",
-           trick,
-           state.tricks[trick].firstPlay.card.value,
-           state.tricks[trick].secondPlay.card.value);
-    printf("Result %i\n", state.tricks[trick].result);
+    printf("\nAposta Atual: %i\n", state->stake);
+    printf("Mão Atual: %i\n", state->currentTrick + 1);
+    printf("Seus Tentos: %i | Tentos do CPU: %i\n", state->playerTentos[0], state->playerTentos[1]);
+  }
+
+  show_user_available_cards(state->playerHands[0].cards);
+
+  // show_players_cards(state->playerHands[0].cards, state->playerHands[1].cards);
+
+  for (int trick = 0; trick <= state->currentTrick; trick++)
+  {
+    card first_card = state->tricks[trick].firstPlay.card;
+    card second_card = state->tricks[trick].secondPlay.card;
+
+    // if (first_card.value == -1)
+    // {
+    //   hide_card(&first_card);
+    // }
+    // else if (second_card.value == -1)
+    // {
+    //   hide_card(&second_card);
+    // }
+
+    char first_card_name[10];
+    char second_card_name[10];
+
+    printf("\nMão %i\nCarta 1: %s | Carta 2: %s\n", trick + 1,
+           get_card_name(first_card_name, first_card.suit, first_card.rank),
+           get_card_name(second_card_name, second_card.suit, second_card.rank));
+    printf("Resultado %i\n", state->tricks[trick].result);
   }
 }

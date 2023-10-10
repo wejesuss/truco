@@ -138,7 +138,7 @@ bool is_same_card(card reference, card move)
   return (same_value && same_look);
 }
 
-char *get_card_name(char cardname[5], enum suits suit, enum rank rank)
+char *get_card_name(char cardname[10], enum suits suit, enum rank rank)
 {
   switch (rank)
   {
@@ -199,10 +199,33 @@ char *get_card_name(char cardname[5], enum suits suit, enum rank rank)
   return cardname;
 }
 
+void show_user_available_cards(card *user_hand)
+{
+  bool presented = false;
+  char presentation[20] = "\n\nSuas cartas:\n";
+  char cardname[10];
+
+  for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
+  {
+    if (!user_hand[i].played)
+    {
+      if (!presented)
+      {
+        printf("%s", presentation);
+        presented = true;
+      }
+
+      printf("%s ", get_card_name(cardname, user_hand[i].suit, user_hand[i].rank));
+    }
+  }
+
+  printf("\n");
+}
+
 void show_players_cards(card *user_hand, card *cpu_hand)
 {
   printf("\n\nPlayers cards\n");
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
     printf("%i %i - ", user_hand[i].value, user_hand[i].played);
     printf("%i %i\n", cpu_hand[i].value, cpu_hand[i].played);

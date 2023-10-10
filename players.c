@@ -23,7 +23,7 @@ int get_available_cards(card *player_cards)
 bool percentage_random(int percentage)
 {
   int range = (rand() % 100) + 1;
-  printf("range: %i | percentage: %i\n", range, percentage);
+  // printf("range: %i | percentage: %i\n", range, percentage);
   int inclusion_limit = percentage;
 
   if (range <= inclusion_limit)
@@ -270,5 +270,5 @@ void show_played_cards(card user_card, card cpu_card)
 {
   char cardname[10];
   printf("%s (%i) vs ", get_card_name(cardname, user_card.suit, user_card.rank), user_card.value);
-  printf("%s (%i)\n\n", get_card_name(&cardname[5], cpu_card.suit, cpu_card.rank), cpu_card.value);
+  printf("%s (%i)\n\n", get_card_name(cardname, cpu_card.suit, cpu_card.rank), cpu_card.value);
 }
