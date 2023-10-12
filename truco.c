@@ -5,6 +5,7 @@
 #include "./lib/tree/truco-node.h"
 #include "./players.h"
 
+void show_hand_play(trick movements, char *hand_name);
 void show_final_victor(int user_tentos, int cpu_tentos);
 void show_state(trucoState *state);
 void raise_stake(trucoState *state);
@@ -16,6 +17,7 @@ alloc_list malloc_list;
 
 card MCTS(trucoState *roostate, int itermax)
 {
+  bool trick_is_over = false;
   moves_available moves = {.quantity = 0, .list = malloc(sizeof(card) * 3)};
   moves_available untried_moves = {.quantity = 0, .list = malloc(sizeof(card) * 3)};
   card rootmove = {.played = true, .value = -1, .rank = -1, .suit = -1};
@@ -42,7 +44,7 @@ card MCTS(trucoState *roostate, int itermax)
       // select ucb child
       node = UCB_select_child(node, 1);
       // do move
-      do_move(&state, node->move);
+      do_move(&state, node->move, &trick_is_over);
 
       get_moves(&state, &moves);
       get_untried_moves(node, &moves, &untried_moves);
@@ -55,8 +57,8 @@ card MCTS(trucoState *roostate, int itermax)
       int pos = rand() % untried_moves.quantity;
       card move = untried_moves.list[pos]; /* select random move */
       int player = state.playerToMove;
-      do_move(&state, move);                /* add move to state */
-      node = add_child(node, move, player); /* add child to node and descend tree */
+      do_move(&state, move, &trick_is_over); /* add move to state */
+      node = add_child(node, move, player);  /* add child to node and descend tree */
       add_to_malloc_list(&malloc_list, node);
     }
 
@@ -66,7 +68,7 @@ card MCTS(trucoState *roostate, int itermax)
       // printf("\n--------------- SIMULATION ---------------\n");
       int pos = rand() % moves.quantity;
       card move = moves.list[pos]; /* select random move */
-      do_move(&state, move);
+      do_move(&state, move, &trick_is_over);
     }
 
     // Backpropagation
@@ -179,8 +181,9 @@ int main()
 {
   printf("Truco\n");
   fflush(stdout);
-
   srand(time(NULL));
+
+  bool trick_is_over = false;
   malloc_list = get_malloc_list(50);
   trucoState rootstate = {
       .stake = 2,
@@ -256,10 +259,14 @@ int main()
       }
     }
 
-    trick last_movement = do_move(&rootstate, move);
-    printf("\nLast Movement\nCarta 1: %i | Carta 2: %i\n", last_movement.firstPlay.card.value, last_movement.secondPlay.card.value);
-    printf("Resultado %i\n", last_movement.result);
+    trick last_movement = do_move(&rootstate, move, &trick_is_over);
+    if (trick_is_over && rootstate.currentTrick == 0) // game reseted
+    {
+      show_hand_play(last_movement, "Última Mão");
+    }
   }
+
+  show_final_victor(rootstate.playerTentos[0], rootstate.playerTentos[1]);
 
   free(moves.list);
   unset_malloc_list(&malloc_list);
@@ -267,15 +274,46 @@ int main()
   return 0;
 }
 
+void show_hand_play(trick movements, char *hand_name)
+{
+  char first_card_name[10];
+  char second_card_name[10];
+  char result[30];
+
+  card first_card = movements.firstPlay.card;
+  card second_card = movements.secondPlay.card;
+
+  printf("\n%s\nCarta 1: %s | Carta 2: %s\n", hand_name,
+         get_card_name(first_card_name, first_card.suit, first_card.rank),
+         get_card_name(second_card_name, second_card.suit, second_card.rank));
+
+  switch (movements.result)
+  {
+  case 1:
+    sprintf(result, "Você ganhou essa mão\0");
+    break;
+
+  case 2:
+    sprintf(result, "CPU ganhou essa mão\0");
+    break;
+
+  default:
+    sprintf(result, "\0");
+    break;
+  };
+
+  printf("%s\n", result);
+}
+
 void show_final_victor(int user_tentos, int cpu_tentos)
 {
   if (user_tentos >= 12)
   {
-    printf("\nVocê GANHOU o jogo\n");
+    printf("\n\nVocê GANHOU o jogo\n");
   }
   else
   {
-    printf("\nVocê PERDEU o jogo\n");
+    printf("\n\nVocê PERDEU o jogo\n");
   }
 }
 
@@ -298,21 +336,9 @@ void show_state(trucoState *state)
     card first_card = state->tricks[trick].firstPlay.card;
     card second_card = state->tricks[trick].secondPlay.card;
 
-    // if (first_card.value == -1)
-    // {
-    //   hide_card(&first_card);
-    // }
-    // else if (second_card.value == -1)
-    // {
-    //   hide_card(&second_card);
-    // }
+    char hand_name[15];
+    sprintf(hand_name, "Mão %i", trick + 1);
 
-    char first_card_name[10];
-    char second_card_name[10];
-
-    printf("\nMão %i\nCarta 1: %s | Carta 2: %s\n", trick + 1,
-           get_card_name(first_card_name, first_card.suit, first_card.rank),
-           get_card_name(second_card_name, second_card.suit, second_card.rank));
-    printf("Resultado %i\n", state->tricks[trick].result);
+    show_hand_play(state->tricks[trick], hand_name);
   }
 }

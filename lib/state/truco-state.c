@@ -291,8 +291,9 @@ int check_winner(trick *tricks, bool check_third_trick)
 /// Must update playerToMove.
 /// @param state The state to be used
 /// @param move The move to insert
+/// @param trick_is_over Boolean pointer to sinalize if trick has been played by all players
 /// @returns a trick struct representing last movements
-trick do_move(trucoState *state, card move)
+trick do_move(trucoState *state, card move, bool *trick_is_over)
 {
   trick *tricks = state->tricks;
   int currentTrick = state->currentTrick;
@@ -300,7 +301,7 @@ trick do_move(trucoState *state, card move)
   playerHand *playerHand = &state->playerHands[playerToMove - 1];
   bool playFirst = tricks[currentTrick].firstPlay.card.played == false;
   trickplay *play = NULL;
-  bool trickIsOver = false;
+  *trick_is_over = false;
 
   if (playFirst)
   {
@@ -309,7 +310,7 @@ trick do_move(trucoState *state, card move)
   else
   {
     play = &tricks[currentTrick].secondPlay;
-    trickIsOver = true;
+    *trick_is_over = true;
   }
 
   // play card in current trick
@@ -325,7 +326,7 @@ trick do_move(trucoState *state, card move)
   state->playerToMove = get_next_player(playerToMove);
 
   // if current trick is secondPlay, then the trick is over
-  if (trickIsOver)
+  if (*trick_is_over)
   {
     trick last_movement;
     trickplay firstPlay, secondPlay;
