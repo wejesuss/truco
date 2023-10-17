@@ -18,7 +18,7 @@ This is a temporary change, don't worry. This will change you set of characters 
 - [X] Create distinct and sharable interfaces for truco state and MCTS nodes
 - [ ] Fix other minor bugs
 - [X] Create CPU "AI" (something better than random decision)
-- [ ] Improve truco and hidding decision (AI independent)
+- [X] Improve truco and hidding decision (AI independent)
 
 
 ### TODO Details
