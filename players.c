@@ -60,7 +60,8 @@ float get_trick_score(int currentTrick, trick *tricks, bool *will_lose_round)
     if (tricks[i].result == WIN)
     {
       trick_score -= 0.25;
-      *will_lose_round = true;
+      if (will_lose_round != NULL)
+        *will_lose_round = true;
     }
     else if (tricks[i].result == LOSE)
     {
