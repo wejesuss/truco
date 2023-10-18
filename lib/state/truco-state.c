@@ -163,6 +163,7 @@ trucoState clone_randomizing(trucoState *state, int player)
     }
   }
 
+  // TODO: randomize cards sequencially considering generated position
   int pos = rand() % TOTAL_CARDS_NUMBER;
   for (int i = 0; i < TOTAL_HAND_CARDS_NUMBER; i++)
   {
