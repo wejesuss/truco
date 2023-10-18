@@ -127,7 +127,7 @@ player_action get_cpu_action(trucoState *state, bool is_hand_of_ten)
   return cpu_action;
 }
 
-player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
+player_action get_choice(card *user_cards, int last_asking_player, int available, bool is_hand_of_ten)
 {
   int choice = 0;
   player_action action = {
@@ -137,7 +137,7 @@ player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
 
   while (choice < 1 || choice > available)
   {
-    show_instruction(available, is_hand_of_ten);
+    show_instruction(available, last_asking_player, is_hand_of_ten);
     fflush(stdout);
 
     choice = 0;
@@ -174,11 +174,11 @@ player_action get_choice(card *user_cards, int available, bool is_hand_of_ten)
   return action;
 }
 
-player_action get_user_action(card *user_cards, bool is_hand_of_ten)
+player_action get_user_action(card *user_cards, int last_asking_player, bool is_hand_of_ten)
 {
   int available = get_available_cards(user_cards);
 
-  return get_choice(user_cards, available, is_hand_of_ten);
+  return get_choice(user_cards, last_asking_player, available, is_hand_of_ten);
 }
 
 enum truco_options ask_cpu_truco()
@@ -245,15 +245,18 @@ enum truco_options ask_user_truco()
   return option;
 }
 
-void show_instruction(int available, bool is_hand_of_ten)
+void show_instruction(int available, int last_asking_player, bool is_hand_of_ten)
 {
   if (!is_hand_of_ten)
   {
-    printf("\nPeça truco com 't'");
+    if (last_asking_player != 1)
+    {
+      printf("\nPeça truco com 't' ");
+    }
 
     if (available != 3)
     {
-      printf(" esconda uma carta com '?'");
+      printf("esconda uma carta com '?'");
     }
   }
 

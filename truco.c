@@ -204,7 +204,7 @@ int main()
     {
       card *user_cards = rootstate.playerHands[0].cards;
       player_action user_action =
-          get_user_action(user_cards,
+          get_user_action(user_cards, rootstate.lastAskingPlayer,
                           is_hand_of_ten(&rootstate));
 
       // He can decide to play a card and ask truco/hide card
